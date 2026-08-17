@@ -7,9 +7,7 @@
 		"types": ["vite/client"],
 		"allowArbitraryExtensions": true,
 		"skipLibCheck": true,
-		// Silencia warning sobre baseUrl deprecated no TS 7.0
-		// Valor deve ser "6.0" para TS 6.x
-		"ignoreDeprecations": "6.0",
+		"ignoreDeprecations": "5.0",
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"]
