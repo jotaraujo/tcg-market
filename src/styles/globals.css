@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "./tokens.css";
-
 *,
 *::before,
 *::after {
@@ -8,14 +6,7 @@
 	margin: 0;
 	padding: 0;
 }
-
-html {
-	-webkit-text-size-adjust: 100%;
-	tab-size: 4;
-}
-
 body {
-	line-height: inherit;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -30,7 +21,6 @@ svg {
 }
 
 input,
-button,
 textarea,
 select {
 	font: inherit;
@@ -40,137 +30,145 @@ select {
 button {
 	background: none;
 	border: none;
+	color: inherit;
 	cursor: pointer;
+	font: inherit;
 }
 
-@theme inline {
-	--color-paper: var(--color-paper);
-	--color-paper-2: var(--color-paper-2);
-	--color-paper-3: var(--color-paper-3);
-	--color-ink: var(--color-ink);
-	--color-ink-2: var(--color-ink-2);
-	--color-ink-3: var(--color-ink-3);
-	--color-rule: var(--color-rule);
-	--color-muted: var(--color-muted);
-	--color-brand: var(--color-accent);
-	--color-brand-hover: var(--color-accent-hover);
-	--color-brand-ink: var(--color-accent-ink);
-	--color-focus-ring: var(--color-focus);
-	--color-gold: var(--color-gold);
-	--color-success: var(--color-success);
-	--color-danger: var(--color-danger);
+@theme {
+	/* --- Surfaces (Paper) ----------------------------------- */
+	--color-paper: oklch(14% 0.012 295);
+	--color-paper-2: oklch(18% 0.014 295);
+	--color-paper-3: oklch(22% 0.016 295);
 
-	--font-display: var(--font-display);
-	--font-body: var(--font-body);
-	--font-outlier: var(--font-outlier);
+	/* --- Text (Ink) ------------------------------------------ */
+	--color-ink: oklch(94% 0.008 295);
+	--color-ink-2: oklch(72% 0.01 295);
+	--color-ink-3: oklch(56% 0.01 295);
 
-	--text-xs: var(--text-xs);
-	--text-sm: var(--text-sm);
-	--text-base: var(--text-base);
-	--text-md: var(--text-md);
-	--text-lg: var(--text-lg);
-	--text-xl: var(--text-xl);
-	--text-2xl: var(--text-2xl);
-	--text-display: var(--text-display);
+	/* --- Structure ------------------------------------------- */
+	--color-rule: oklch(30% 0.01 295);
+	--color-muted: oklch(56% 0.01 295);
 
-	--font-title: var(--font-display);
-	--font-body: var(--font-body);
-	--font-outlier: var(--font-outlier);
+	/* --- Accent  --------------------------------------------- */
+	--color-accent: oklch(55% 0.2 295);
+	--color-accent-hover: oklch(62% 0.2 295);
+	--color-accent-ink: oklch(96% 0.008 295);
+	--color-focus: oklch(58% 0.22 295);
 
-	--spacing-3xs: var(--space-3xs);
-	--spacing-2xs: var(--space-2xs);
-	--spacing-xs: var(--space-xs);
-	--spacing-sm: var(--space-sm);
-	--spacing-md: var(--space-md);
-	--spacing-lg: var(--space-lg);
-	--spacing-xl: var(--space-xl);
-	--spacing-2xl: var(--space-2xl);
-	--spacing-3xl: var(--space-3xl);
-	--spacing-4xl: var(--space-4xl);
-	--spacing-5xl: var(--space-5xl);
-	--spacing-6xl: var(--space-6xl);
-	--spacing-7xl: var(--space-7xl);
-	--spacing-8xl: var(--space-8xl);
-	--spacing-9xl: var(--space-9xl);
-	--spacing-10xl: var(--space-10xl);
+	/* --- Semantic -------------------------------------------- */
+	--color-gold: oklch(78% 0.16 85);
+	--color-success: oklch(72% 0.18 145);
+	--color-danger: oklch(62% 0.2 25);
 
-	--radius-card: var(--radius-card);
-	--radius-input: var(--radius-input);
-	--radius-pill: var(--radius-pill);
+	/* --- Typography ------------------------------------------ */
+	--font-title: "Space Grotesk", ui-sans-serif, system-ui;
+	--font-body: "Geist", ui-sans-serif, system-ui, sans-serif;
+	--font-outlier: "Geist Mono", ui-monospace, monospace;
 
-	--ease-out: var(--ease-out);
-	--ease-in: var(--ease-in);
-	--ease-in-out: var(--ease-in-out);
+	/* --- Type Scale ------------------------------------------- */
+	--text-xs: 0.64rem;
+	--text-sm: 0.8rem;
+	--text-base: 1rem;
+	--text-md: 1.25rem;
+	--text-lg: 1.5625rem;
+	--text-xl: 1.9531rem;
+	--text-2xl: 2.4414rem;
+	--text-display: clamp(2.75rem, 5vw + 1rem, 4.5rem);
+
+	/* --- Spacing ---------------------------------------------- */
+	--spacing-3xs: 0.125rem;
+	--spacing-2xs: 0.25rem;
+	--spacing-xs: 0.5rem;
+	--spacing-sm: 0.75rem;
+	--spacing-md: 1rem;
+	--spacing-lg: 1.5rem;
+	--spacing-xl: 2.5rem;
+	--spacing-2xl: 4rem;
+	--spacing-3xl: 6rem;
+	--spacing-4xl: 8rem;
+	--spacing-5xl: 10rem;
+	--spacing-6xl: 15rem;
+	--spacing-7xl: 20rem;
+	--spacing-8xl: 25rem;
+	--spacing-9xl: 30rem;
+	--spacing-10xl: 35rem;
+
+	/* --- Border Radius --------------------------------------- */
+	--radius-card: 12px;
+	--radius-input: 8px;
+	--radius-pill: 999px;
+
+	/* --- Motion ---------------------------------------------- */
+	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+	--ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+	--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+	--dur-micro: 120ms;
+	--dur-short: 220ms;
+	--dur-long: 420ms;
 }
 
 :root {
-	--background: 14% 0.012 295;
-	--foreground: 94% 0.008 295;
+	--background: var(--color-paper);
+	--foreground: var(--color-ink);
 
-	--card: 18% 0.014 295;
-	--card-foreground: 94% 0.008 295;
+	--card: var(--color-paper-2);
+	--card-foreground: var(--color-ink);
 
-	--popover: 18% 0.014 295;
-	--popover-foreground: 94% 0.008 295;
+	--popover: var(--color-paper-2);
+	--popover-foreground: var(--color-ink);
 
-	--primary: 55% 0.2 295;
-	--primary-foreground: 96% 0.008 295;
+	--primary: var(--color-accent);
+	--primary-foreground: var(--color-accent-ink);
 
-	--secondary: 18% 0.014 295;
-	--secondary--foreground: 94% 0.008 295;
+	--secondary: var(--color-paper-2);
+	--secondary--foreground: var(--color-ink);
 
-	--muted: 30% 0.01 295;
-	--muted-foreground: 56% 0.01 295;
+	--muted: var(--color-rule);
+	--muted-foreground: var(--color-muted);
 
-	--accent: 22% 0.016 295;
-	--accent-foreground: 94% 0.008 295;
+	--accent: var(--color-paper-3);
+	--accent-foreground: var(--color-ink);
 
-	--destructive: 62% 0.2 25;
-	--destructive-foreground: 96% 0.008 295;
+	--destructive: var(--color-danger);
+	--destructive-foreground: var(--color-ink);
 
-	--border: 30% 0.01 295;
-	--input: 20% 0.01 295;
-	--ring: 58% 0.22 295;
+	--border: var(--color-rule);
+	--input: var(--color-paper-2);
+	--ring: var(--color-focus);
 
-	--radius: 0.75rem;
+	--radius: var(--radius-card);
 
 	color-scheme: dark;
 }
 
-@theme inline {
-	--color-background: oklch(var(--background));
-	--color-foreground: oklch(var(--foreground));
-	--color-card: oklch(var(--card));
-	--color-card-foreground: oklch(var(--card-foreground));
-	--color-popover: oklch(var(--popover));
-	--color-popover-foreground: oklch(var(--popover-foreground));
-	--color-primary: oklch(var(--primary));
-	--color-primary-foreground: oklch(var(--primary-foreground));
-	--color-secondary: oklch(var(--secondary));
-	--color-secondary-foreground: oklch(var(--secondary--foreground));
-	--color-muted: oklch(var(--muted));
-	--color-muted-foreground: oklch(var(--muted-foreground));
-	--color-accent: oklch(var(--accent));
-	--color-accent-foreground: oklch(var(--accent-foreground));
-	--color-destructive: oklch(var(--destructive));
-	--color-destructive-foreground: oklch(var(--destructive-foreground));
-	--color-border: oklch(var(--border));
-	--color-input: oklch(var(--input));
-	--color-ring: oklch(var(--ring));
+@theme {
+	--color-panel: var(--color-paper-2);
+	--color-panel-surface: var(--color-paper-3);
+	--color-canvas: var(--color-paper-3);
+}
 
-	--radius-sm: calc(var(--radius) - 8px);
-	--radius-md: calc(var(--radius) - 4px);
-	--radius-lg: var(--radius);
-	--radius-xl: calc(var(--radius) + 4px);
+.gold-glow {
+	text-shadow: 0 0 12px oklch(78% 0.16 85 / 0.4);
+}
+
+.card-hover {
+	transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-hover:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.aspect-card {
+	aspect-ratio: 2.5 / 3.5;
 }
 
 @layer base {
-	* {
-		@apply border-border outline-ring/50;
-	}
-
 	body {
-		@apply bg-background text-foreground;
+		background-color: var(--background);
+		color: var(--foreground);
 		font-family: var(--font-body);
 		line-height: 1.55;
 		font-variant-numeric: tabular-nums;
@@ -196,8 +194,8 @@ button {
 	*,
 	*::before,
 	*::after {
-		animation-duration: 0.01ms !important;
-		animation-iteration-count: 1 !important;
-		transition-duration: 150ms !important;
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+		transition-duration: 150ms;
 	}
 }
