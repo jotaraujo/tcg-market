@@ -11,33 +11,35 @@ const CardItem = ({ card, image }: CardItemProps) => {
 	const setName = lastestSet?.set_name ?? 'A ser lançado'
 	const setRarity = lastestSet?.set_rarity ?? 'N/A'
 	const setPrice = lastestSet?.set_price ?? 'N/A'
-
+	//
 	return (
-		<article className='flex flex-col items-center max-w-6xl max-h-8xl rounded-card border border-muted bg-card gap-xs'>
-			<div className='max-w-5xl'>
+		<article className='bg-panel rounded-lg p-xs border border-rule flex flex-col gap-sm card-hover cursor-pointer'>
+			<div className='relative w-full aspect-card rounded-md overflow-hidden'>
 				{imageUrl && (
 					<img
 						src={imageUrl}
 						alt={card.name}
-						className='rounded-card'
+						className='rounded-md w-full h-full'
 						loading='lazy'
 					/>
 				)}
 			</div>
-			<div className='flex flex-1 flex-col gap-xs'>
+			<div className='flex flex-col grow gap-sm'>
 				<h3
-					className='line-clamp-1 font-semibold text-ink text-sm'
+					className='font-sans font-medium text-body text-ink line-clamp-1'
 					title={card.name}
 				>
 					{card.name}
 				</h3>
+				<p className='font-sans text-sm text-muted line-clamp-1'>
+					Set: {setName} • {setRarity}
+				</p>
+			</div>
 
-				<span className='text-sm text-muted border-b border-rule pb-4' title={setName}>
-				Set: {setName} - {setRarity}
-				</span>
-
-				<div className='mt-auto flex gap-3 pt-2 text-sm font-medium'>
-					<p className='text-blue-600'>Preço: {setPrice}</p>
+			<div className='flex items-end justify-between mt-auto pt-3 border-t border-rule'>
+				<div className='flex flex-col'>
+					<span className='text-gold text-md gold-glow'>Preço:</span>
+					<span className='text-gold text-lg gold-glow'>$ {setPrice}</span>
 				</div>
 			</div>
 		</article>
