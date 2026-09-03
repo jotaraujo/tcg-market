@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useCards } from '@/hooks/useCards'
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import CardItem from './CardItem'
@@ -18,9 +19,13 @@ const CardGrid = ({ filters }: CardGridProps) => {
 		isFetchingNextPage,
 	} = useCards(filters)
 
+	// Ref para o container de scroll que será passado ao hook
+	const containerRef = useRef<HTMLDivElement>(null)
+
 	const sentinelRef = useIntersectionObserver({
 		onIntersect: fetchNextPage,
 		enabled: hasNextPage,
+		containerRef, // passa o container para observar relative a ele, não viewport
 	})
 
 	if (isLoading) {
@@ -44,21 +49,20 @@ const CardGrid = ({ filters }: CardGridProps) => {
 	}
 
 	return (
-    <div className='flex flex-col'>
-      <div className='grid grid-cols-2 gap-md sm:grid-cols-5 md:grid-cols-6'>
-        {cards.map((card) => (
-          <CardItem key={card.id} card={card} image={card.card_images[0]}/>
-        ))}
-      </div>
+		<div ref={containerRef} className='flex-1 min-h-0 overflow-y-auto'>
+			<div className='grid grid-cols-2 gap-md sm:grid-cols-5 md:grid-cols-6'>
+				{cards.map((card) => (
+					<CardItem key={card.id} card={card} image={card.card_images[0]}/>
+				))}
+			</div>
 
-      
-    {hasNextPage && (
-      <div ref={sentinelRef} className='flex justify-center py-xs'>
-        {isFetchingNextPage && <span className='text-base text-muted'>Carregando mais cartas...</span>}
-      </div>
-    )}
-    </div>
-  )
+			{hasNextPage && (
+				<div ref={sentinelRef} className='flex justify-center py-xs'>
+					{isFetchingNextPage && <span className='text-base text-muted'>Carregando mais cartas...</span>}
+				</div>
+			)}
+		</div>
+	)
 }
 
 export default CardGrid
