@@ -38,6 +38,15 @@ button {
 	font: inherit;
 }
 
+.scrollbar-hide {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
+}
+
 @theme {
 	/* --- Surfaces (Paper) ----------------------------------- */
 	--color-paper: oklch(14% 0.012 295);
