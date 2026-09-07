@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchCards } from "@/lib/api/ygoprodeck";
-import { ONE_DAY_MS, ONE_WEEK_MS } from "@/lib/constants/time";
+import { ONE_DAY_MS, ONE_WEEK_MS } from "@/constants/time";
 import type { CardFilters } from "@/types/filters";
 
 const PAGE_SIZE = 20
