@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Store, Layers, ArrowLeftRight, User, type LucideIcon } from 'lucide-react'
+import { Store, Layers, Heart, User, type LucideIcon } from 'lucide-react'
 
 interface NavItem {
 	label: string
@@ -10,7 +10,7 @@ interface NavItem {
 const NAV_LINKS: NavItem[] = [
   { label: 'Market', href: '/marketplace', icon: Store },
   { label: 'Colections', href: '/sets', icon: Layers },
-  { label: 'Favorites', href: '/favorites', icon: ArrowLeftRight },
+  { label: 'Favorites', href: '/favorites', icon: Heart },
   { label: 'Profile', href: '/profile', icon: User },
 ]
 
@@ -21,8 +21,8 @@ const NavLinks = () => {
 				<Link
 					key={href}
 					to={href}
-					className='text-sm font-medium text-ink transition-all duration-500'
-					activeProps={{ className: 'bg-accent text-ink font-semibold py-2 px-4 rounded-full' }}
+					className='flex gap-1 text-sm font-medium text-ink transition-all duration-400'
+					activeProps={{ className: 'bg-primary text-ink font-semibold px-3 py-2 rounded-full shadow-[0_0_16px_rgba(139,92,246,0.6)]' }}
 				>
 					<Icon className='w-4 h-4'/>
 					{label}
