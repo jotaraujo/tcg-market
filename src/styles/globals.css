@@ -1,42 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Geist:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300..700&display=swap");
 @import "tailwindcss";
-
-* {
-	box-sizing: border-box;
-}
-
-html, body, #root {
-	height: 100%;
-	margin: 0;
-}
-
-body {
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-}
-
-img,
-picture,
-video,
-canvas,
-svg {
-	display: block;
-	max-width: 100%;
-}
-
-input,
-textarea,
-select {
-	font: inherit;
-	color: inherit;
-}
-
-button {
-	background: none;
-	border: none;
-	color: inherit;
-	cursor: pointer;
-	font: inherit;
-}
 
 @theme {
 	/* --- Surfaces (Paper) ----------------------------------- */
@@ -51,12 +14,12 @@ button {
 
 	/* --- Structure ------------------------------------------- */
 	--color-rule: oklch(30% 0.01 295);
-	--color-muted: oklch(56% 0.01 295);
+	--color-subtle: oklch(56% 0.01 295);
 
 	/* --- Accent  --------------------------------------------- */
-	--color-accent: oklch(55% 0.2 295);
-	--color-accent-hover: oklch(62% 0.2 295);
-	--color-accent-ink: oklch(96% 0.008 295);
+	--color-brand: oklch(55% 0.2 295);
+	--color-brand-hover: oklch(62% 0.2 295);
+	--color-brand-ink: oklch(96% 0.008 295);
 	--color-focus: oklch(58% 0.22 295);
 
 	/* --- Semantic -------------------------------------------- */
@@ -109,72 +72,78 @@ button {
 	--dur-micro: 120ms;
 	--dur-short: 220ms;
 	--dur-long: 420ms;
-}
 
-:root {
-	--background: var(--color-paper);
-	--foreground: var(--color-ink);
+	/* --- Mapeamento das Variáveis de Sistema do Shadcn (Tailwind v4) --- */
+	--color-background: var(--color-paper);
+	--color-foreground: var(--color-ink);
 
-	--card: var(--color-paper-2);
-	--card-foreground: var(--color-ink);
+	--color-text: var(--color-ink);
+	--color-text-foreground: var(--color-ink-2);
+	--color-text-muted: var(--color-ink-3);
 
-	--popover: var(--color-paper-2);
-	--popover-foreground: var(--color-ink);
+	--color-card: var(--color-paper-2);
+	--color-card-foreground: var(--color-ink);
 
-	--primary: var(--color-accent);
-	--primary-foreground: var(--color-accent-ink);
+	--color-popover: var(--color-paper-2);
+	--color-popover-foreground: var(--color-ink);
 
-	--secondary: var(--color-paper-2);
-	--secondary--foreground: var(--color-ink);
+	--color-primary: var(--color-brand);
+	--color-primary-hover: var(--color-brand-hover);
+	--color-primary-foreground: var(--color-brand-ink);
 
-	--muted: var(--color-rule);
-	--muted-foreground: var(--color-muted);
+	--color-secondary: var(--color-paper-2);
+	--color-secondary-foreground: var(--color-ink); /* Corrigido o '--' duplo */
 
-	--accent: var(--color-paper-3);
-	--accent-foreground: var(--color-ink);
+	--color-muted: var(--color-rule);
+	--color-muted-foreground: var(--color-subtle);
 
-	--destructive: var(--color-danger);
-	--destructive-foreground: var(--color-ink);
+	--color-accent: var(--color-paper-3);
+	--color-accent-foreground: var(--color-ink);
 
-	--border: var(--color-rule);
-	--input: var(--color-paper-2);
-	--ring: var(--color-focus);
+	--color-destructive: var(--color-danger);
+	--color-destructive-foreground: var(--color-ink);
 
-	--radius: var(--radius-card);
+	--color-border: var(--color-rule);
+	--color-input: var(--color-paper-2);
+	--color-ring: var(--color-focus);
 
-	color-scheme: dark;
-}
+	--radius-badge: var(--radius-card);
 
-@theme {
 	--color-panel: var(--color-paper-2);
 	--color-panel-surface: var(--color-paper-3);
 	--color-canvas: var(--color-paper-3);
 }
 
+/* Utilitários Customizados */
 .gold-glow {
 	text-shadow: 0 0 12px oklch(78% 0.16 85 / 0.4);
 }
-
 .card-hover {
-	transition: all .3s cubic-bezier(0.16, 1, 0.3, 1);
+	transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 .card-hover:hover {
 	transform: translateY(-3px);
 	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
-
 .aspect-card {
 	aspect-ratio: 2.5 / 3.5;
+}
+.scrollbar-hide {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
 }
 
 @layer base {
 	body {
-		background-color: var(--background);
-		color: var(--foreground);
+		background-color: var(--color-background);
+		color: var(--color-foreground);
 		font-family: var(--font-body);
 		line-height: 1.55;
 		font-variant-numeric: tabular-nums;
+		color-scheme: dark;
 	}
 
 	h1,
@@ -190,6 +159,14 @@ button {
 	.font-outlier {
 		font-family: var(--font-outlier);
 		font-variant-numeric: tabular-nums;
+	}
+
+	/* Aplica estilos padrão sem quebrar utilitários do Tailwind */
+	html,
+	body,
+	#root {
+		height: 100%;
+		margin: 0;
 	}
 }
 
