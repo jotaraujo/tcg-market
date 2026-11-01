@@ -5,6 +5,7 @@ import CardItem from './CardItem'
 import type { CardFilters } from '@/types/filters'
 
 interface CardGridProps {
+	// Aqui cria um novo tipo CardFilters sem as propriedades 'num' e 'offset'
 	filters: Omit<CardFilters, 'num' | 'offset'>
 }
 
@@ -14,6 +15,8 @@ const CardGrid = ({ filters }: CardGridProps) => {
 		isLoading,
 		isError,
 		error,
+		refetch,
+		isFetching,
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
@@ -34,10 +37,13 @@ const CardGrid = ({ filters }: CardGridProps) => {
 
 	if (isError) {
 		return (
-			<p className='p-2xs text-center text-danger'>
-				{error?.message ?? 'Algo deu errado ao buscar as cartas.'}
-			</p>
+			<ErrorState
+				message={error?.message ?? 'Algo deu errado ao buscar as cartas.'}
+				onRetry={refetch}
+				isRetrying={isFetching}
+			/>
 		)
+	}
 	}
 
 	const cards = data?.pages.flatMap((page) => page.data) ?? []
