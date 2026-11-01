@@ -3,6 +3,8 @@ import { useCards } from '@/hooks/useCards'
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import CardItem from './CardItem'
 import type { CardFilters } from '@/types/filters'
+import ErrorState from '../ui/ErrorState'
+import LoadingState from '../ui/LoadingState'
 
 interface CardGridProps {
 	// Aqui cria um novo tipo CardFilters sem as propriedades 'num' e 'offset'
@@ -32,18 +34,23 @@ const CardGrid = ({ filters }: CardGridProps) => {
 	})
 
 	if (isLoading) {
-		return <p className='p-2xs text-center text-muted'>Carregando cartas...</p>
+		return (
+			<div className='flex flex-1 items-center justify-center min-h-0 overflow-y-auto'>
+				<LoadingState message={'Carregando cartas...'}/>
+			</div>
+		)
 	}
 
 	if (isError) {
 		return (
-			<ErrorState
-				message={error?.message ?? 'Algo deu errado ao buscar as cartas.'}
-				onRetry={refetch}
-				isRetrying={isFetching}
-			/>
+			<div className='flex-1 min-h-0 overflow-y-auto flex items-center justify-center'>
+				<ErrorState
+					message={error?.message ?? 'Algo deu errado ao buscar as cartas.'}
+					onRetry={refetch}
+					isRetrying={isFetching}
+				/>
+			</div>
 		)
-	}
 	}
 
 	const cards = data?.pages.flatMap((page) => page.data) ?? []
@@ -58,13 +65,17 @@ const CardGrid = ({ filters }: CardGridProps) => {
 		<div ref={containerRef} className='flex-1 min-h-0 overflow-y-auto'>
 			<div className='grid grid-cols-2 gap-md sm:grid-cols-5 md:grid-cols-6'>
 				{cards.map((card) => (
-					<CardItem key={card.id} card={card} image={card.card_images[0]}/>
+					<CardItem key={card.id} card={card} image={card.card_images[0]} />
 				))}
 			</div>
 
 			{hasNextPage && (
 				<div ref={sentinelRef} className='flex justify-center py-xs'>
-					{isFetchingNextPage && <span className='text-base text-muted'>Carregando mais cartas...</span>}
+					{isFetchingNextPage && (
+						<span className='text-base text-muted'>
+							Carregando mais cartas...
+						</span>
+					)}
 				</div>
 			)}
 		</div>
