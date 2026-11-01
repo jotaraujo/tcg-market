@@ -5,6 +5,7 @@ import CardItem from './CardItem'
 import type { CardFilters } from '@/types/filters'
 import ErrorState from '../ui/ErrorState'
 import LoadingState from '../ui/LoadingState'
+import { Loader2 } from 'lucide-react'
 
 interface CardGridProps {
 	// Aqui cria um novo tipo CardFilters sem as propriedades 'num' e 'offset'
@@ -36,7 +37,7 @@ const CardGrid = ({ filters }: CardGridProps) => {
 	if (isLoading) {
 		return (
 			<div className='flex flex-1 items-center justify-center min-h-0 overflow-y-auto'>
-				<LoadingState message={'Carregando cartas...'}/>
+				<LoadingState message={'Carregando cartas...'} />
 			</div>
 		)
 	}
@@ -72,9 +73,7 @@ const CardGrid = ({ filters }: CardGridProps) => {
 			{hasNextPage && (
 				<div ref={sentinelRef} className='flex justify-center py-xs'>
 					{isFetchingNextPage && (
-						<span className='text-base text-muted'>
-							Carregando mais cartas...
-						</span>
+						<Loader2 className='animate-spin h-8 w-8 text-primary' />
 					)}
 				</div>
 			)}
