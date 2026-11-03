@@ -2,12 +2,9 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
   test: {
-    environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
-    globals: true,
-  },
+    environment: 'jsdom', // Usa o JSDOM para simular o navegador
+    globals: true,  // Habilita variáveis globais como `describe`, `it`, `expect`
+  }
 })
