@@ -9,7 +9,7 @@ import {
 	DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
 import { useAuthStore } from '@/stores/auth'
-import { Button } from '../ui/button'
+import { Button } from '../ui/Button'
 
 const UserMenu = () => {
 	const { isAuthenticated, user, logout } = useAuthStore()
