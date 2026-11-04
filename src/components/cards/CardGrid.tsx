@@ -6,6 +6,7 @@ import type { CardFilters } from '@/types/filters'
 import ErrorState from '../ui/ErrorState'
 import LoadingState from '../ui/LoadingState'
 import { Loader2 } from 'lucide-react'
+import CardSkeleton from './CardSkeleton'
 
 interface CardGridProps {
 	// Aqui cria um novo tipo CardFilters sem as propriedades 'num' e 'offset'
@@ -36,8 +37,12 @@ const CardGrid = ({ filters }: CardGridProps) => {
 
 	if (isLoading) {
 		return (
-			<div className='flex flex-1 items-center justify-center min-h-0 overflow-y-auto'>
-				<LoadingState message={'Carregando cartas...'} />
+			<div className='flex-1 min-h-0 overflow-y-auto p-6'>
+				<div className='grid grid-cols-2 gap-md sm:grid-cols-5 md:grid-cols-6'>
+					{Array.from({ length: 10 }).map((_, index) => (
+						<CardSkeleton key={index}/>
+					))}
+				</div>
 			</div>
 		)
 	}
