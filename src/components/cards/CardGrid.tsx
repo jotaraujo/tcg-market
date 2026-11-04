@@ -4,7 +4,6 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import CardItem from './CardItem'
 import type { CardFilters } from '@/types/filters'
 import ErrorState from '../ui/ErrorState'
-import LoadingState from '../ui/LoadingState'
 import { Loader2 } from 'lucide-react'
 import CardSkeleton from './CardSkeleton'
 
