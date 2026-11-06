@@ -1,10 +1,11 @@
-import { useRef } from 'react'
-import { useCards } from '@/hooks/useCards'
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
-import CardItem from './CardItem'
 import type { CardFilters } from '@/types/filters'
-import ErrorState from '../ui/ErrorState'
+import { Link } from '@tanstack/react-router'
+import { useRef } from 'react'
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
+import { useCards } from '@/hooks/useCards'
 import { Loader2 } from 'lucide-react'
+import CardItem from './CardItem'
+import ErrorState from '../ui/ErrorState'
 import CardSkeleton from './CardSkeleton'
 
 interface CardGridProps {
@@ -39,7 +40,7 @@ const CardGrid = ({ filters }: CardGridProps) => {
 			<div className='flex-1 min-h-0 overflow-y-auto p-6'>
 				<div className='grid grid-cols-2 gap-md sm:grid-cols-5 md:grid-cols-6'>
 					{Array.from({ length: 10 }).map((_, index) => (
-						<CardSkeleton key={index}/>
+						<CardSkeleton key={index} />
 					))}
 				</div>
 			</div>
@@ -70,7 +71,14 @@ const CardGrid = ({ filters }: CardGridProps) => {
 		<div ref={containerRef} className='flex-1 min-h-0 overflow-y-auto'>
 			<div className='grid grid-cols-2 gap-md sm:grid-cols-5 md:grid-cols-6'>
 				{cards.map((card) => (
-					<CardItem key={card.id} card={card} image={card.card_images[0]} />
+					<Link
+						key={card.id}
+						to='/card/$id'
+						params={{ id: String(card.id) }}
+						className='flex flex-col gap-sm p-xs rounded-lg card-hover border border-rule bg-panel cursor-pointer'
+					>
+						<CardItem card={card} image={card.card_images[0]} />
+					</Link>
 				))}
 			</div>
 

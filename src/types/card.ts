@@ -86,8 +86,8 @@ export type CardRace = (typeof CARD_RACES)[keyof typeof CARD_RACES][number]
 export interface CardImage {
 	id: number
 	image_url: string
-	image_url_small: string
-	image_url_cropped: string
+	image_url_small: string | undefined
+	image_url_cropped: string | undefined
 }
 
 export interface CardSet {
