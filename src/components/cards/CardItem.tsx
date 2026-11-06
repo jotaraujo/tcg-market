@@ -2,10 +2,11 @@ import type { Card, CardImage } from '@/types/card'
 
 interface CardItemProps {
 	card: Card
-	image: CardImage
+	image?: CardImage
+	onClick?: (event: React.MouseEvent<HTMLDivElement>) => void
 }
 
-const CardItem = ({ card, image }: CardItemProps) => {
+const CardItem = ({ card, image, onClick, ...rest }: CardItemProps) => {
 	const imageUrl = image?.image_url_small
 	const lastestSet = card.card_sets?.[card.card_sets.length - 1]
 	const setName = lastestSet?.set_name ?? 'A ser lançado'
@@ -13,7 +14,11 @@ const CardItem = ({ card, image }: CardItemProps) => {
 	const setPrice = lastestSet?.set_price ?? 'N/A'
 	//
 	return (
-		<article className='bg-panel rounded-lg p-xs border border-rule flex flex-col gap-sm card-hover cursor-pointer'>
+		<article
+			{...rest}
+			className='bg-panel rounded-lg p-xs border border-rule flex flex-col gap-sm card-hover cursor-pointer'
+			onClick={onClick}
+		>
 			<div className='relative w-full aspect-card rounded-md overflow-hidden'>
 				{imageUrl && (
 					<img
