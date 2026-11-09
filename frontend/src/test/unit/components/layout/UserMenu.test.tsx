@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useAuthStore } from '#/stores/useAuthStore'
 import UserMenu from '@/components/layout/UserMenu'
-import { useAuthStore } from '@/stores/auth'
 
 // ===================================================
 // DESCRIÇÃO DO TESTE SUITE

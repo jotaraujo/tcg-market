@@ -1,5 +1,7 @@
 import { LogIn, UserPlus, LogOut, User } from 'lucide-react'
+import { useAuthStore } from '#/stores/useAuthStore'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { Button } from '../ui/button'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -8,8 +10,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
-import { useAuthStore } from '@/stores/auth'
-import { Button } from '../ui/button'
 
 const UserMenu = () => {
 	const { isAuthenticated, user, logout } = useAuthStore()

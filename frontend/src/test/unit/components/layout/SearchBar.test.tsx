@@ -1,5 +1,5 @@
-import { render, screen, fireEvent, act } from '@testing-library/react'
-import { useSearchTermStore } from '@/stores/SearchTerm'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import { useSearchTermStore } from '#/stores/useSearchTermStore'
 import SearchBar from '@/components/layout/SearchBar'
 
 describe('SearchBar', () => {
