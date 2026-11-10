@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchTerm } from '@/hooks/useSearchTerm'
-import { Input } from '../../../@/components/ui/input'
+import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
 
 const SearchBar = () => {
@@ -22,7 +22,7 @@ const SearchBar = () => {
 			<Input
 				type='text'
 				value={inputValue}
-				onChange={({ target }) => setInputValue(target.value)}
+				onChange={(e) => setInputValue(e.target.value)}
         placeholder='Buscar cartas...'
         className='w-full rounded-full bg-input text-sm text-text placeholder:text-text-muted outline-none focus-visible:ring-1 ring-accent cursor-pointer transition-all duration-200'
 			/>
