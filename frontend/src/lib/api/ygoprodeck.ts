@@ -1,6 +1,6 @@
-import { buildCardQuery } from "../buildCardQuery"
-import type { Card, CardApiResponse, CardImage } from "@/types/card"
-import type { CardFilters } from "@/types/filters"
+import { buildCardQuery } from '../buildCardQuery'
+import type { CardApiResponse } from '@/types/card'
+import type { CardFilters } from '@/types/filters'
 
 const BASE_URL = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
 
@@ -8,50 +8,26 @@ export const fetchCards = async (filters: CardFilters = {}): Promise<CardApiResp
   const filterPages: CardFilters = {
     num: 20,
     offset: 0,
-    ...filters
+    ...filters,
   }
-  
+
   const query = buildCardQuery(filterPages)
   // Se não tiver algum filtro, busca tudo. Se tiver, monta com "?" e os parâmetros
   const url = query ? `${BASE_URL}?${query}` : BASE_URL
 
   try {
-  const response = await fetch(url)
-
-  if (!response.ok) {
-    throw new Error(`Erro ao buscar cartas: ${response.status} ${response.statusText}`)
-  }
-
-  const data: CardApiResponse = await response.json()
-
-  return data
-
-  } catch(error) {
-    console.error('Falha na requisição das cartas:', error)
-    throw error instanceof Error ? error : new Error('Erro desconhecido ao buscar cartas da API')
-  }
-}
-
-export const fetchCardById = async (id: string): Promise<Card & CardMidia> => {
-  const url = `${BASE_URL}?id=${id}`
-
-  try {
     const response = await fetch(url)
 
     if (!response.ok) {
-      throw new Error(`Erro ao buscar carta: ${response.status} ${response.statusText}`)
+      throw new Error(`Erro ao buscar cartas: ${response.status} ${response.statusText}`)
     }
 
     const data: CardApiResponse = await response.json()
 
-    if (!data.data || data.data.length === 0) {
-      throw new Error(`Carta com ID ${id} não encontrada`)
-    }
-
-    return data.data[0]
+    return data
   } catch (error) {
-    console.error(`Falha na requisição da carta: ${error}`)
-    throw error instanceof Error ? error : new Error('Erro desconhecido ao buscar carta da API')
+    console.error('Falha na requisição das cartas:', error)
+    throw error instanceof Error ? error : new Error('Erro desconhecido ao buscar cartas da API')
   }
 }
 
