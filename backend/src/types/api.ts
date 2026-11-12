@@ -86,26 +86,50 @@ export type CardAttribute =
  * Interfaces para as respostas BRUTAS das APIs externas.
  */
 
+export interface YGOPRODECK_CardSet {
+	set_name: string
+	set_code: string
+	set_rarity: string
+}
+
+export interface YGOPRODECK_CardPrice {
+	tcgplayer_price: string
+}
+
 export interface YGOPRODECK_RawCard {
 	id: number
 	name: string
 	type: CardType // Tipagem Forte
 	race: CardRace // Tipagem Forte
-	attribute: CardAttribute // Tipagem Forte
-	level: number
-	atk: number
-	def: number
+	attribute?: CardAttribute // Tipagem Forte
+	level?: number
+	atk?: number
+	def?: number
 	card_images: {
 		image_url: string
 	}[]
-	set_name: string
-	set_rarity: string
-	tcgplayer_price: string
-	[key: string]: any
+	card_sets?: YGOPRODECK_CardSet[]
+	card_prices?: YGOPRODECK_CardPrice[]
 }
 
 export interface YGOPRODECK_ApiResponse {
 	data: YGOPRODECK_RawCard[]
+}
+
+export interface JustTCG_Card {
+	uuid: string
+	name: string
+	number: string | null
+	set: string
+	rarity: string | null
+	variants: JustTCG_Variant[]
+}
+
+export interface JustTCG_Variant {
+	condition: string
+	printing: string
+	price: number
+	priceHistory?: { t: number; p: number }[] | null
 }
 
 export interface JustTCG_PriceEntry {
@@ -113,8 +137,4 @@ export interface JustTCG_PriceEntry {
 	price: number
 }
 
-export interface JustTCG_ApiResponse {
-	prices: JustTCG_PriceEntry[]
-	card_id: string
-	[key: string]: any
-}
+export type PriceHistoryStatus = 'ok' | 'not_found' | 'no_match' | 'ambiguous' | 'unavailable'
