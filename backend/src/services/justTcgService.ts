@@ -23,7 +23,6 @@ async function fetchCardsByNumber(number: string): Promise<JustTCG_Card[]> {
 		include_price_history: 'true',
 		priceHistoryDuration: '30d',
 	})
-	console.log(`[JustTCG] cache miss para ${number}`)
 	const res = await fetch(`${BASE_URL}?${params}`, {
 		headers: { 'x-api-key': apiKey },
 	})
