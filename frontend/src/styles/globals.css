@@ -28,7 +28,7 @@
 	--color-danger: oklch(62% 0.2 25);
 
 	/* --- Typography ------------------------------------------ */
-	--font-title: "Space Grotesk", ui-sans-serif, system-ui;
+	--font-display: "Space Grotesk", ui-sans-serif, system-ui;
 	--font-body: "Geist", ui-sans-serif, system-ui, sans-serif;
 	--font-outlier: "Geist Mono", ui-monospace, monospace;
 
@@ -94,7 +94,7 @@
 	--color-secondary: var(--color-paper-2);
 	--color-secondary-foreground: var(--color-ink); /* Corrigido o '--' duplo */
 
-	--color-muted: var(--color-rule);
+	--color-muted: var(--color-paper-3);
 	--color-muted-foreground: var(--color-subtle);
 
 	--color-accent: var(--color-paper-3);
@@ -146,6 +146,11 @@
 		color-scheme: dark;
 	}
 
+	:focus-visible {
+		outline: 2px solid var(--color-focus);
+		outline-offset: 2px;
+	}
+
 	h1,
 	h2,
 	h3,
@@ -171,7 +176,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	*,
+	*:not(.animate-spin, .animate-pulse),
 	*::before,
 	*::after {
 		animation-duration: 0.01ms;

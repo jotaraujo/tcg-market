@@ -63,13 +63,13 @@ const CardGrid = ({ filters }: CardGridProps) => {
 
 	if (cards.length === 0) {
 		return (
-			<p className='p-2xs text-center text-muted'>Nenhuma carta encontrada.</p>
+			<p className='p-2xs text-center text-text-foreground'>Nenhuma carta encontrada.</p>
 		)
 	}
 
 	return (
 		<div ref={containerRef} className='flex-1 min-h-0 overflow-y-auto'>
-			<div className='grid grid-cols-2 gap-md sm:grid-cols-5 md:grid-cols-6'>
+			<div className='grid grid-cols-2 gap-md mt-2 sm:grid-cols-5 md:grid-cols-6'>
 				{cards.map((card) => (
 					<Link
 						key={card.id}

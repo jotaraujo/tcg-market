@@ -31,12 +31,12 @@ const CardItem = ({ card, image, onClick, ...rest }: CardItemProps) => {
 			</div>
 			<div className='flex flex-col grow gap-sm'>
 				<h3
-					className='font-sans font-medium text-body text-ink line-clamp-1'
+					className='font-body font-medium text-ink line-clamp-1'
 					title={card.name}
 				>
 					{card.name}
 				</h3>
-				<p className='font-sans text-sm text-muted line-clamp-1'>
+				<p className='font-body text-sm text-text-foreground line-clamp-1'>
 					Set: {setName} • {setRarity}
 				</p>
 			</div>

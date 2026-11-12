@@ -23,10 +23,10 @@ const ErrorState = ({ message, onRetry, isRetrying }: ErrorStateProps) => {
           {isRetrying ? (
             <>
               <Loader2 data-testid='loader' className='animate-spin h-4 w-4'/>
-              <p className='text-base text-muted'>Tentando Novamente...</p>
+              <span className='text-base text-text-foreground'>Tentando Novamente...</span>
             </>
           ) : (
-            <p className='text-base text-muted'>Tentar Novamente</p>
+            <span className='text-base text-text-foreground'>Tentar Novamente</span>
           )}
         </Button>
       )}
