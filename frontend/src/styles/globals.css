@@ -65,6 +65,12 @@
 	--radius-input: 8px;
 	--radius-pill: 999px;
 
+	/* --- Shadows --------------------------------------------- */
+	/* Glow do accent: mesmo hue/chroma do --color-brand, só com alpha. */
+	--shadow-glow-brand: 0 0 16px oklch(55% 0.2 295 / 0.5);
+	/* Menus flutuantes: sombra escura e difusa, sem cor (o canvas já é escuro). */
+	--shadow-menu: 0 12px 32px oklch(0% 0 0 / 0.5);
+
 	/* --- Motion ---------------------------------------------- */
 	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 	--ease-in: cubic-bezier(0.7, 0, 0.84, 0);
