@@ -18,15 +18,15 @@ const ErrorState = ({ message, onRetry, isRetrying }: ErrorStateProps) => {
         <Button
         disabled={isRetrying}
         onClick={onRetry}
-        className='gap-2 p-6'
+        className='gap-2 p-6 cursor-pointer'
         >
           {isRetrying ? (
             <>
               <Loader2 data-testid='loader' className='animate-spin h-4 w-4'/>
-              <span className='text-base text-text-foreground'>Tentando Novamente...</span>
+              <span className='text-base text-foreground'>Tentando Novamente...</span>
             </>
           ) : (
-            <span className='text-base text-text-foreground'>Tentar Novamente</span>
+            <span className='text-base text-foreground'>Tentar Novamente</span>
           )}
         </Button>
       )}
