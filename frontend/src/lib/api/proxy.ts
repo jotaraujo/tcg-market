@@ -9,23 +9,35 @@
  * basta alterar este módulo — nenhum componente muda.
  */
 
-import type { UnifiedCardResponse } from '@/types/proxy'
+import type { Printing, UnifiedCardResponse } from '@/types/proxy'
+
+export type PrintingParams = Partial<Pick<Printing, 'setCode' | 'rarity'>>
 
 const PROXY_BASE =
-  (import.meta.env.VITE_PROXY_URL as string) || 'http://localhost:3001'
+	(import.meta.env.VITE_PROXY_URL as string) || 'http://localhost:3001'
 
 export const fetchCardFullData = async (
-  cardId: string,
+	cardId: string,
+	printing?: PrintingParams,
+	signal?: AbortSignal,
 ): Promise<UnifiedCardResponse> => {
-  const response = await fetch(`${PROXY_BASE}/api/tcg/${cardId}`)
+	const params = new URLSearchParams()
+	if (printing?.setCode) params.set('setCode', printing.setCode)
+	if (printing?.rarity) params.set('rarity', printing.rarity)
+	const qs = params.toString()
 
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error(`Carta com ID ${cardId} não encontrada`)
-    }
-    throw new Error(`Proxy error: ${response.status} ${response.statusText}`)
-  }
+	const response = await fetch(
+		`${PROXY_BASE}/api/tcg/${cardId}${qs ? `?${qs}` : ''}`,
+		{ signal },
+	)
 
-  const json: UnifiedCardResponse = await response.json()
-  return json
+	if (!response.ok) {
+		if (response.status === 404) {
+			throw new Error(`Carta com ID ${cardId} não encontrada`)
+		}
+		throw new Error(`Proxy error: ${response.status} ${response.statusText}`)
+	}
+
+	const json: UnifiedCardResponse = await response.json()
+	return json
 }
