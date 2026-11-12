@@ -1,23 +1,10 @@
 import { Link } from '@tanstack/react-router'
-import { Store, Layers, Heart, User, type LucideIcon } from 'lucide-react'
-
-interface NavItem {
-	label: string
-	href: string
-	icon: LucideIcon
-}
-
-const NAV_LINKS: NavItem[] = [
-  { label: 'Market', href: '/marketplace', icon: Store },
-  { label: 'Colections', href: '/sets', icon: Layers },
-  { label: 'Favorites', href: '/favorites', icon: Heart },
-  { label: 'Profile', href: '/profile', icon: User },
-]
+import { NAV_ITEMS } from './navItems'
 
 const NavLinks = () => {
 	return (
-		<nav className='flex items-center gap-4'>
-			{NAV_LINKS.map(({ label, href, icon: Icon }) => (
+		<nav aria-label='Principal' className='flex items-center gap-4'>
+			{NAV_ITEMS.map(({ label, href, icon: Icon }) => (
 				<Link
 					key={href}
 					to={href}
