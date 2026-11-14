@@ -8,10 +8,6 @@ import NavLinks from './NavLinks'
 import SearchBar from './SearchBar'
 import UserMenu from './UserMenu'
 
-// Breakpoint único do header: `lg` (1024px). Em `md` (768px) a nav com texto
-// + busca + avatar não cabe (medido: ~920px de conteúdo), então tablet usa o layout mobile.
-//   < lg: [logo]                      [lupa] [menu]
-//   ≥ lg: [logo TCGMarket] [nav] [busca] [avatar]
 const Header = () => {
 	const [isSearchOpen, setIsSearchOpen] = useState(false)
 	const searchTriggerRef = useRef<HTMLButtonElement>(null)

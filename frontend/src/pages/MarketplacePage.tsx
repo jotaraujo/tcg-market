@@ -15,11 +15,12 @@ const MarketplacePage = () => {
   }
 
 	return (
-		<main className='flex flex-col gap-6 w-full p-6'>
+		<section className='flex flex-col gap-6 w-full p-6'>
 			<div className='flex flex-1 min-h-0 overflow-hidden'>
+				<h1></h1>
 				<CardGrid filters={combinedFilters} />
 			</div>
-		</main>
+		</section>
 	)
 }
 
