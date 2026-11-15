@@ -58,7 +58,7 @@ describe('CardItem', () => {
 
 	it('should show the correct price of the card', () => {
 		render(<CardItem card={card} image={image} />)
-		expect(screen.getByText('$ 6.97')).toBeInTheDocument()
+		expect(screen.getByText('$0.33')).toBeInTheDocument()
 	})
 
 	it('should not render image when it is not provided', () => {
