@@ -1,10 +1,17 @@
-import { render, screen } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
+import { screen } from '@testing-library/react'
+import { HttpResponse, http } from 'msw'
+import { describe, expect, it, vi } from 'vitest'
 import CardGrid from '@/components/cards/CardGrid'
-import type { Card, CardMidia } from '@/types/card'
+import { useCards } from '@/hooks/useCards'
+import { makeCard } from '@/test/mocks/fixtures/cards'
+import { exchangeFixture } from '@/test/mocks/fixtures/exchange'
+import { server } from '@/test/mocks/server'
+import { renderWithClient } from '@/test/utils'
 import type { CardFilters } from '@/types/filters'
 
 // 1. Mocks de Hooks
+// useCards continua mockado: aqui o foco é o CardGrid reagindo ao câmbio.
+// O useExchange NÃO é mockado: roda de verdade e o fetch cai no MSW.
 vi.mock('@/hooks/useCards', () => ({
 	useCards: vi.fn(),
 }))
@@ -27,43 +34,37 @@ vi.mock('@tanstack/react-router', () => ({
 	},
 }))
 
-// 3. Mock de Dados (Card & CardMidia para cobrir card_images)
-const mockCard: Card & CardMidia = {
-	id: 123,
+// 3. Dados: carta de US$ 10,00 (com a taxa da fixture, 5.6637 → R$ 56,64)
+const mockCard = makeCard(123, {
 	name: 'Dark Magician',
-	fname: 'Dark Magician',
-	type: 'Normal Monster',
-	race: 'Spellcaster',
-	attribute: 'DARK',
-	atk: 2500,
-	def: 2100,
-	level: 7,
-	archetype: 'Dark Magician',
-	typeline: ['Spellcaster', 'Normal'],
-	humanReadableCardType: 'Normal Monster',
-	frameType: 'normal',
-	card_prices: [],
-	card_sets: [
+	card_prices: [
 		{
-			set_name: 'Starter Deck',
-			set_code: 'SD1',
-			set_rarity: 'Ultra Rare',
-			set_rarity_code: '(UR)',
-			set_price: '10.00',
+			tcgplayer_price: '10.00',
+			ebay_price: '0.00',
+			amazon_price: '0.00',
+			coolstuffinc_price: '0.00',
 		},
 	],
-	card_images: [
-		{
-			id: 123,
-			image_url: 'https://example.com/card.jpg',
-			image_url_small: 'https://example.com/card_small.jpg',
-			image_url_cropped: 'https://example.com/card_cropped.jpg',
-		},
-	],
-	ygoprodeck_url: 'https://ygoprodeck.com/card/?id=123',
-}
+})
 
-import { useCards } from '@/hooks/useCards'
+const EXCHANGE_URL = 'https://api.frankfurter.dev/v1/latest'
+
+// Estado "padrão" de useCards: pronto, sem erro, sem próxima página.
+// Cada teste sobrescreve só o que importa.
+const mockUseCards = (overrides: Record<string, unknown> = {}) => {
+	vi.mocked(useCards).mockReturnValue({
+		data: { pages: [{ data: [mockCard] }] },
+		isLoading: false,
+		isError: false,
+		error: null,
+		refetch: vi.fn(),
+		isFetching: false,
+		fetchNextPage: vi.fn(),
+		hasNextPage: false,
+		isFetchingNextPage: false,
+		...overrides,
+	} as unknown as ReturnType<typeof useCards>)
+}
 
 describe('CardGrid', () => {
 	// Filtros genéricos para testes — type assertion para evitar erros de literal union
@@ -74,83 +75,109 @@ describe('CardGrid', () => {
 	} as unknown as Omit<CardFilters, 'num' | 'offset'>
 
 	it('should show loading skeletons when isLoading is true', () => {
-		vi.mocked(useCards).mockReturnValue({
-			data: undefined,
-			isLoading: true,
-			isError: false,
-			error: null,
-			refetch: vi.fn(),
-			isFetching: false,
-			fetchNextPage: vi.fn(),
-			hasNextPage: false,
-			isFetchingNextPage: false,
-		} as any)
+		mockUseCards({ data: undefined, isLoading: true })
 
-		render(<CardGrid filters={defaultFilters} />)
+		renderWithClient(<CardGrid filters={defaultFilters} />)
 
-		// Verifica se os skeletons de loading estão na tela
-		const skeletons = screen.getAllByRole('generic')
-		expect(skeletons.length).toBeGreaterThan(0)
+		// Os skeletons aparecem já no primeiro render (nada assíncrono aqui)
+		expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0)
 	})
 
-	it('should show error state when isError is true', () => {
-		vi.mocked(useCards).mockReturnValue({
+	it('should show error state when isError is true', async () => {
+		mockUseCards({
 			data: undefined,
-			isLoading: false,
 			isError: true,
 			error: { message: 'Erro de API' },
-			refetch: vi.fn(),
-			isFetching: false,
-			fetchNextPage: vi.fn(),
-			hasNextPage: false,
-			isFetchingNextPage: false,
-		} as any)
+		})
 
-		render(<CardGrid filters={defaultFilters} />)
+		renderWithClient(<CardGrid filters={defaultFilters} />)
 
-		// Verifica se a mensagem de erro aparece
-		expect(screen.getByText('Erro de API')).toBeInTheDocument()
+		// O grid segura o skeleton até o câmbio terminar, então o erro
+		// só aparece depois da resposta do MSW → findBy espera, getBy não
+		expect(await screen.findByText('Erro de API')).toBeInTheDocument()
 	})
 
-	it('should show empty message when no cards are found', () => {
-		vi.mocked(useCards).mockReturnValue({
-			data: { pages: [{ data: [] }] },
-			isLoading: false,
-			isError: false,
-			error: null,
-			refetch: vi.fn(),
-			isFetching: false,
-			fetchNextPage: vi.fn(),
-			hasNextPage: false,
-			isFetchingNextPage: false,
-		} as any)
+	it('should show empty message when no cards are found', async () => {
+		mockUseCards({ data: { pages: [{ data: [] }] } })
 
-		render(<CardGrid filters={defaultFilters} />)
+		renderWithClient(<CardGrid filters={defaultFilters} />)
 
-		// Verifica texto "Nenhuma carta encontrada"
-		expect(screen.getByText('Nenhuma carta encontrada.')).toBeInTheDocument()
+		expect(
+			await screen.findByText('Nenhuma carta encontrada.'),
+		).toBeInTheDocument()
 	})
 
-	it('should render cards and their links when data is available', () => {
-		vi.mocked(useCards).mockReturnValue({
-			data: { pages: [{ data: [mockCard] }] },
-			isLoading: false,
-			isError: false,
-			error: null,
-			refetch: vi.fn(),
-			isFetching: false,
-			fetchNextPage: vi.fn(),
-			hasNextPage: false,
-			isFetchingNextPage: false,
-		} as any)
+	it('should render cards and their links when data is available', async () => {
+		mockUseCards()
 
-		render(<CardGrid filters={defaultFilters} />)
+		renderWithClient(<CardGrid filters={defaultFilters} />)
 
-		// Verifica se o nome 'Dark Magician' está na tela
-		expect(screen.getByText('Dark Magician')).toBeInTheDocument()
+		expect(await screen.findByText('Dark Magician')).toBeInTheDocument()
 
 		// Verifica se existe um link com href="/card/123"
 		const link = screen.getByTestId('card-link')
 		expect(link).toHaveAttribute('href', '/card/123')
+	})
+
+	describe('câmbio USD → R$', () => {
+		it('should hold the skeleton until the exchange rate arrives', async () => {
+			// Segura a resposta do câmbio até chamarmos release()
+			let release!: () => void
+			const gate = new Promise<void>((resolve) => {
+				release = resolve
+			})
+			server.use(
+				http.get(EXCHANGE_URL, async () => {
+					await gate
+					return HttpResponse.json(exchangeFixture)
+				}),
+			)
+			mockUseCards()
+
+			renderWithClient(<CardGrid filters={defaultFilters} />)
+
+			// Câmbio pendente: skeleton na tela e nenhuma carta ainda
+			expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0)
+			expect(screen.queryByText('Dark Magician')).not.toBeInTheDocument()
+
+			release()
+
+			expect(await screen.findByText('Dark Magician')).toBeInTheDocument()
+			expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument()
+		})
+
+		it('should show the price in BRL when the rate is available', async () => {
+			mockUseCards()
+
+			renderWithClient(<CardGrid filters={defaultFilters} />)
+
+			// 10 * 5.6637 = 56.637 → "R$ 56,64". O Intl usa espaço não separável
+			// entre "R$" e o número, por isso a regex em vez do texto exato.
+			expect(await screen.findByText(/R\$\s*56,64/)).toBeInTheDocument()
+		})
+
+		it('should fall back to USD when the exchange API fails', async () => {
+			// fetchUsdBrlRate loga o erro; silencia só neste teste
+			const consoleError = vi
+				.spyOn(console, 'error')
+				.mockImplementation(() => {})
+			server.use(
+				http.get(EXCHANGE_URL, () =>
+					HttpResponse.json({ error: 'indisponível' }, { status: 500 }),
+				),
+			)
+			mockUseCards()
+
+			renderWithClient(<CardGrid filters={defaultFilters} />)
+
+			// O useExchange tem retry: 2 (1s + 2s de backoff), e isso vale mais do
+			// que o retry: false do QueryClient de teste. Por isso o timeout longo.
+			expect(
+				await screen.findByText('$10.00', {}, { timeout: 5000 }),
+			).toBeInTheDocument()
+			expect(screen.queryByText(/R\$/)).not.toBeInTheDocument()
+
+			consoleError.mockRestore()
+		}, 10000)
 	})
 })

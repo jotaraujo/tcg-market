@@ -56,9 +56,37 @@ describe('CardItem', () => {
 		expect(screen.getByText('Dark Magician')).toBeInTheDocument()
 	})
 
-	it('should show the correct price of the card', () => {
-		render(<CardItem card={card} image={image} />)
-		expect(screen.getByText('$0.33')).toBeInTheDocument()
+	describe('preço', () => {
+		const cardWithoutPrice: Card = {
+			...card,
+			card_prices: [],
+			card_sets: [],
+		}
+
+		it('should show the price in USD when there is no exchange rate', () => {
+			render(<CardItem card={card} image={image} />)
+			expect(screen.getByText('$0.33')).toBeInTheDocument()
+			expect(screen.queryByText(/R\$/)).not.toBeInTheDocument()
+		})
+
+		it('should show the price converted to BRL when the rate is provided', () => {
+			render(<CardItem card={card} image={image} rate={5} />)
+			// 0.33 * 5 = 1.65. O Intl usa espaço não separável entre "R$" e o
+			// número, por isso a regex em vez do texto exato.
+			expect(screen.getByText(/R\$\s*1,65/)).toBeInTheDocument()
+			expect(screen.queryByText('$0.33')).not.toBeInTheDocument()
+		})
+
+		it('should show "Sem preço" when the card has no price', () => {
+			render(<CardItem card={cardWithoutPrice} image={image} />)
+			expect(screen.getByText('Sem preço')).toBeInTheDocument()
+		})
+
+		it('should keep "Sem preço" even when the rate is provided', () => {
+			render(<CardItem card={cardWithoutPrice} image={image} rate={5} />)
+			expect(screen.getByText('Sem preço')).toBeInTheDocument()
+			expect(screen.queryByText(/R\$/)).not.toBeInTheDocument()
+		})
 	})
 
 	it('should not render image when it is not provided', () => {
