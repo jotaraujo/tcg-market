@@ -9,9 +9,12 @@ const NavLinks = () => {
 					key={href}
 					to={href}
 					className='flex gap-1 text-sm font-medium text-ink transition-all duration-400'
-					activeProps={{ className: 'bg-primary text-ink font-semibold px-3 py-2 rounded-pill shadow-glow-brand' }}
+					activeProps={{
+						className:
+							'bg-primary text-ink font-semibold px-3 py-2 rounded-pill shadow-glow-brand',
+					}}
 				>
-					<Icon className='w-4 h-4'/>
+					<Icon className='w-4 h-4' />
 					{label}
 				</Link>
 			))}

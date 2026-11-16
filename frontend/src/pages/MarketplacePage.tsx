@@ -9,10 +9,10 @@ const MarketplacePage = () => {
 		{},
 	)
 
-  const combinedFilters: Omit<CardFilters, 'num' | 'offset'> = {
-    ...filters,
-    fname: term || undefined,
-  }
+	const combinedFilters: Omit<CardFilters, 'num' | 'offset'> = {
+		...filters,
+		fname: term || undefined,
+	}
 
 	return (
 		<section className='flex flex-col gap-6 w-full p-6'>

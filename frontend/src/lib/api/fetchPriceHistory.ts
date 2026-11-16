@@ -6,7 +6,6 @@ export const fetchPriceHistory = async (
 	cardId: string,
 ): Promise<PriceHistory[]> => {
 	try {
-
 		const response = await fetch(`${BASE_URL}?id=${cardId}`, {
 			headers: {
 				'x-api-key': `${import.meta.env.VITE_JUSTTCG_API_KEY}`,
@@ -22,9 +21,9 @@ export const fetchPriceHistory = async (
 		const data = await response.json()
 		const history = data.data?.[0]?.variants?.[0]?.markets?.[0]?.price_history
 
-    if (!history) {
-      throw new Error('Price history not available for this card')
-    }
+		if (!history) {
+			throw new Error('Price history not available for this card')
+		}
 
 		// JustTCG typically returns an array of price points.
 		// We map the response to our internal PriceHistoryEntry format.

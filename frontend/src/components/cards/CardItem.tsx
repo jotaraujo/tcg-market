@@ -7,7 +7,10 @@ interface CardItemProps {
 	onClick?: (event: React.MouseEvent<HTMLDivElement>) => void
 }
 
-const formatUsd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+const formatUsd = new Intl.NumberFormat('en-US', {
+	style: 'currency',
+	currency: 'USD',
+})
 
 const CardItem = ({ card, image, onClick, ...rest }: CardItemProps) => {
 	const imageUrl = image?.image_url_small
@@ -48,7 +51,9 @@ const CardItem = ({ card, image, onClick, ...rest }: CardItemProps) => {
 				<div className='flex flex-col'>
 					<span className='text-gold text-md gold-glow'>Preço:</span>
 					{priceUsd !== null ? (
-						<span className='text-gold text-lg gold-glow'>{formatUsd.format(priceUsd)}</span>
+						<span className='text-gold text-lg gold-glow'>
+							{formatUsd.format(priceUsd)}
+						</span>
 					) : (
 						<span className='text-sm text-ink-2 mb-5'>Sem preço</span>
 					)}

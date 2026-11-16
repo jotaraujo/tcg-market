@@ -137,4 +137,9 @@ export interface JustTCG_PriceEntry {
 	price: number
 }
 
-export type PriceHistoryStatus = 'ok' | 'not_found' | 'no_match' | 'ambiguous' | 'unavailable'
+export type PriceHistoryStatus =
+	| 'ok'
+	| 'not_found'
+	| 'no_match'
+	| 'ambiguous'
+	| 'unavailable'

@@ -26,7 +26,11 @@ const UserMenu = () => {
 					<Avatar className='size-9 border border-primary-hover shadow-glow-brand'>
 						<AvatarImage src='' alt='' />
 						<AvatarFallback className='bg-transparent text-ink'>
-							{isAuthenticated ? initials : <User className='size-4' aria-hidden='true' />}
+							{isAuthenticated ? (
+								initials
+							) : (
+								<User className='size-4' aria-hidden='true' />
+							)}
 						</AvatarFallback>
 					</Avatar>
 				</Button>

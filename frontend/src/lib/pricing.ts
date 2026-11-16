@@ -14,6 +14,6 @@ export const getCardPriceUsd = (card: PriceSource): number | null => {
 	const setPrices = (card.card_sets ?? [])
 		.map((set) => toPositivePrices(set.set_price))
 		.filter((price): price is number => price !== null)
-  
-    return setPrices.length > 0 ? Math.min(...setPrices) : null
+
+	return setPrices.length > 0 ? Math.min(...setPrices) : null
 }

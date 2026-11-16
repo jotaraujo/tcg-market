@@ -27,7 +27,10 @@ const AccountMenuItems = () => {
 
 			<DropdownMenuGroup>
 				{isAuthenticated ? (
-					<DropdownMenuItem onClick={logout} className='min-h-10 gap-sm px-3 text-sm text-ink cursor-pointer'>
+					<DropdownMenuItem
+						onClick={logout}
+						className='min-h-10 gap-sm px-3 text-sm text-ink cursor-pointer'
+					>
 						<LogOut className='size-4 text-ink-2' aria-hidden='true' />
 						Sair
 					</DropdownMenuItem>

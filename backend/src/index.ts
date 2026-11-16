@@ -24,16 +24,14 @@ app.get('/api/tcg/:id', async (req: Request, res: Response) => {
 	const { id } = req.params
 
 	if (!/^\d+$/.test(id)) {
-		return res
-			.status(400)
-			.json({
-				error: 'ID inválido',
-				details: 'O ID da carta deve ser numérico.',
-			})
+		return res.status(400).json({
+			error: 'ID inválido',
+			details: 'O ID da carta deve ser numérico.',
+		})
 	}
 
-  const setCode = getQueryString(req.query.setCode)
-  const rarity = getQueryString(req.query.rarity)
+	const setCode = getQueryString(req.query.setCode)
+	const rarity = getQueryString(req.query.rarity)
 
 	try {
 		const cardData = await proxyService.getCardFullData(id, setCode, rarity)

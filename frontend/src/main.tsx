@@ -9,18 +9,18 @@ const router = getRouter()
 
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
+	interface Register {
+		router: typeof router
+	}
 }
 
 // Render the app
 const rootElement = document.getElementById('root')!
 
 ReactDOM.createRoot(rootElement).render(
-  <StrictMode>
-    <QueryClientProvider client={new QueryClient()}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  </StrictMode>
+	<StrictMode>
+		<QueryClientProvider client={new QueryClient()}>
+			<RouterProvider router={router} />
+		</QueryClientProvider>
+	</StrictMode>,
 )

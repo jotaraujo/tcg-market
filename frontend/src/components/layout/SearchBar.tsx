@@ -24,7 +24,12 @@ const SearchBar = ({ ref, className }: SearchBarProps) => {
 	}, [inputValue, setTerm])
 
 	return (
-		<label className={cn('flex flex-1 max-w-256 items-center gap-2 rounded-full bg-transparent px-4 py-2 text-muted-foreground cursor-pointer', className)}>
+		<label
+			className={cn(
+				'flex flex-1 max-w-256 items-center gap-2 rounded-full bg-transparent px-4 py-2 text-muted-foreground cursor-pointer',
+				className,
+			)}
+		>
 			<Search className='h-4 w-4 shrink-0' aria-hidden='true' />
 			<Input
 				ref={ref}

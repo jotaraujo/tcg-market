@@ -63,7 +63,9 @@ const CardGrid = ({ filters }: CardGridProps) => {
 
 	if (cards.length === 0) {
 		return (
-			<p className='p-2xs text-center text-text-foreground'>Nenhuma carta encontrada.</p>
+			<p className='p-2xs text-center text-text-foreground'>
+				Nenhuma carta encontrada.
+			</p>
 		)
 	}
 

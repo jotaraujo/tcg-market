@@ -145,6 +145,6 @@ export interface CardApiMeta {
 }
 
 export interface CardApiResponse {
-  data: (Card & CardMidia)[]
+	data: (Card & CardMidia)[]
 	meta?: CardApiMeta
 }
