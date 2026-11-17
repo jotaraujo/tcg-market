@@ -5,7 +5,8 @@ interface CardItemProps {
 	card: Card
 	image?: CardImage
 	rate?: number
-	onClick?: (event: React.MouseEvent<HTMLDivElement>) => void
+	// Cartas da primeira dobra: imagem carregada na hora (melhora o LCP).
+	priority?: boolean
 }
 
 const formatUsd = new Intl.NumberFormat('en-US', {
@@ -18,70 +19,60 @@ const formatBrl = new Intl.NumberFormat('pt-BR', {
 	currency: 'BRL',
 })
 
-const CardItem = ({
-	card,
-	image,
-	rate,
-	onClick,
-	...rest
-}: CardItemProps) => {
+const CardItem = ({ card, image, rate, priority = false }: CardItemProps) => {
 	const imageUrl = image?.image_url_small
 	const lastestSet = card.card_sets?.[card.card_sets.length - 1]
 	const setName = lastestSet?.set_name ?? 'A ser lançado'
-	const setRarity = lastestSet?.set_rarity ?? 'N/A'
 
 	const priceUsd = getCardPriceUsd(card)
 	let priceLabel: React.ReactNode
 	if (priceUsd === null) {
-		priceLabel = <span className='text-sm text-ink-2 mb-5'>Sem preço</span>
-	}  else if (rate !== undefined) {
+		priceLabel = <span className='text-sm text-ink-2'>Sem preço</span>
+	} else if (rate !== undefined) {
 		priceLabel = (
-			<span className='text-gold text-lg gold-glow'>
+			<span className='font-outlier text-sm text-gold gold-glow'>
 				{formatBrl.format(priceUsd * rate)}
 			</span>
 		)
 	} else {
 		priceLabel = (
-			<span className='text-gold text-lg gold-glow'>
+			<span className='font-outlier text-sm text-gold gold-glow'>
 				{formatUsd.format(priceUsd)}
 			</span>
 		)
 	}
 
 	return (
-		<article
-			{...rest}
-			className='bg-panel rounded-lg p-xs border border-rule flex flex-col gap-sm card-hover cursor-pointer'
-			onClick={onClick}
-		>
+		<article className='bg-panel rounded-card p-xs border border-rule flex flex-col gap-sm h-full card-hover'>
 			<div className='relative w-full aspect-card rounded-md overflow-hidden'>
 				{imageUrl && (
+					// alt vazio: o nome da carta já está no texto logo abaixo, então a
+					// arte é decorativa (evita o leitor de tela ler o nome duas vezes).
 					<img
 						src={imageUrl}
-						alt={card.name}
-						className='rounded-md w-full h-full'
-						loading='lazy'
+						alt=''
+						className='rounded-md w-full h-full object-cover'
+						loading={priority ? 'eager' : 'lazy'}
+						fetchPriority={priority ? 'high' : 'auto'}
+						decoding='async'
 					/>
 				)}
 			</div>
 			<div className='flex flex-col grow gap-sm'>
+				{/* 2 linhas reservadas: o que diferencia cartas da mesma família
+				    ("Infernoble Arms - Almace/Durendal") fica no fim do nome. */}
 				<h3
-					className='font-body font-medium text-ink line-clamp-1'
+					className='font-body text-base font-medium text-ink line-clamp-2 min-h-[2lh]'
 					title={card.name}
 				>
 					{card.name}
 				</h3>
 				<p className='font-body text-sm text-text-foreground line-clamp-1'>
-					Set: {setName} • {setRarity}
+					{setName}
 				</p>
 			</div>
 
-			<div className='flex items-end justify-between mt-auto pt-3 border-t border-rule'>
-				<div className='flex flex-col'>
-					<span className='text-gold text-md gold-glow'>Preço:</span>
-					{priceLabel}
-				</div>
-			</div>
+			<div className='mt-auto pt-3 border-t border-rule'>{priceLabel}</div>
 		</article>
 	)
 }

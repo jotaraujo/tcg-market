@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import CardItem from '@/components/cards/CardItem'
 import type { Card, CardImage } from '@/types/card'
 
@@ -89,16 +88,71 @@ describe('CardItem', () => {
 		})
 	})
 
-	it('should not render image when it is not provided', () => {
-		const imageWithoutUrl = { ...image, image_url_small: undefined }
-		render(<CardItem card={card} image={imageWithoutUrl} />)
-		expect(screen.queryByRole('img')).not.toBeInTheDocument()
+	describe('conteúdo', () => {
+		it('should show only the set name, without the "Set:" prefix or the rarity', () => {
+			render(<CardItem card={card} image={image} />)
+			expect(screen.getByText('2016 Mega-Tins')).toBeInTheDocument()
+			expect(screen.queryByText(/Set:/)).not.toBeInTheDocument()
+			expect(screen.queryByText(/Ultra Rare/)).not.toBeInTheDocument()
+		})
+
+		it('should show "A ser lançado" when the card has no sets', () => {
+			render(<CardItem card={{ ...card, card_sets: [] }} image={image} />)
+			expect(screen.getByText('A ser lançado')).toBeInTheDocument()
+		})
+
+		it('should not render the "Preço:" label', () => {
+			render(<CardItem card={card} image={image} />)
+			expect(screen.queryByText('Preço:')).not.toBeInTheDocument()
+		})
+
+		it('should expose the full name in the title attribute', () => {
+			const longName = 'A'.repeat(80)
+			render(<CardItem card={{ ...card, name: longName }} image={image} />)
+			expect(screen.getByTitle(longName)).toBeInTheDocument()
+		})
 	})
 
-	it('should call onClick when card is clicked', async () => {
-		const handleClick = vi.fn()
-		render(<CardItem card={card} image={image} onClick={handleClick} />)
-		await userEvent.click(screen.getByRole('article'))
-		expect(handleClick).toHaveBeenCalledTimes(1)
+	describe('imagem', () => {
+		// alt vazio dá role "presentation", então queryByRole('img') não enxerga
+		// a tag: procuramos direto no DOM.
+		const getImg = (container: HTMLElement) => container.querySelector('img')
+
+		it('should not render image when it is not provided', () => {
+			const imageWithoutUrl = { ...image, image_url_small: undefined }
+			const { container } = render(
+				<CardItem card={card} image={imageWithoutUrl} />,
+			)
+			expect(getImg(container)).not.toBeInTheDocument()
+		})
+
+		it('should render the art as decorative so the name is not read twice', () => {
+			const { container } = render(<CardItem card={card} image={image} />)
+			expect(getImg(container)).toHaveAttribute('alt', '')
+			// o nome continua acessível uma única vez, no heading
+			expect(
+				screen.getAllByText('Dark Magician', { exact: true }),
+			).toHaveLength(1)
+		})
+
+		it('should lazy-load the art by default', () => {
+			const { container } = render(<CardItem card={card} image={image} />)
+			expect(getImg(container)).toHaveAttribute('loading', 'lazy')
+		})
+
+		it('should load the art eagerly with high priority when priority is set', () => {
+			const { container } = render(
+				<CardItem card={card} image={image} priority />,
+			)
+			expect(getImg(container)).toHaveAttribute('loading', 'eager')
+			expect(getImg(container)).toHaveAttribute('fetchpriority', 'high')
+		})
+	})
+
+	it('should let the name use two lines so similar cards stay distinguishable', () => {
+		render(<CardItem card={card} image={image} />)
+		expect(screen.getByRole('heading', { name: 'Dark Magician' })).toHaveClass(
+			'line-clamp-2',
+		)
 	})
 })
