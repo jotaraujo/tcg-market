@@ -45,7 +45,9 @@ const CardGrid = ({ filters }: CardGridProps) => {
 	// o container como root o sentinel ficava "visível" para sempre.
 	const sentinelRef = useIntersectionObserver({
 		onIntersect: fetchNextPage,
-		enabled: hasNextPage,
+		// Desligado durante a busca: ao terminar, o observer é recriado e reavalia o
+		// sentinel (ver teste). Também evita pedir a mesma página duas vezes.
+		enabled: hasNextPage && !isFetchingNextPage,
 	})
 
 	if (isLoading || isPending) {

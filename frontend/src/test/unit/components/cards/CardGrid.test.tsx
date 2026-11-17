@@ -128,6 +128,21 @@ describe('CardGrid', () => {
 		expect(options).toMatchObject({ enabled: true })
 	})
 
+	// O IntersectionObserver só avisa quando o sentinel muda de "fora" para
+	// "dentro". Se, depois de carregar uma página, ele continuar na área visível
+	// (janela alta, zoom reduzido), nenhuma mudança acontece e a paginação para.
+	// Desligar o sensor durante a busca recria o observer ao terminar, e o
+	// observe() inicial reavalia se o sentinel ainda está visível.
+	it('should pause the sentinel while the next page loads', async () => {
+		mockUseCards({ hasNextPage: true, isFetchingNextPage: true })
+
+		renderWithClient(<CardGrid filters={defaultFilters} />)
+		await screen.findByRole('list')
+
+		const options = vi.mocked(useIntersectionObserver).mock.calls.at(-1)?.[0]
+		expect(options).toMatchObject({ enabled: false })
+	})
+
 	it('should render the cards as a list so screen readers announce the count', async () => {
 		mockUseCards()
 
