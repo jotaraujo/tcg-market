@@ -27,16 +27,16 @@ const CardItem = ({ card, image, rate, priority = false }: CardItemProps) => {
 	const priceUsd = getCardPriceUsd(card)
 	let priceLabel: React.ReactNode
 	if (priceUsd === null) {
-		priceLabel = <span className='text-sm text-ink-2'>Sem preço</span>
+		priceLabel = <span className='text-base text-ink-2'>Sem preço</span>
 	} else if (rate !== undefined) {
 		priceLabel = (
-			<span className='font-outlier text-sm text-gold gold-glow'>
+			<span className='font-outlier text-base text-gold gold-glow'>
 				{formatBrl.format(priceUsd * rate)}
 			</span>
 		)
 	} else {
 		priceLabel = (
-			<span className='font-outlier text-sm text-gold gold-glow'>
+			<span className='font-outlier text-base text-gold gold-glow'>
 				{formatUsd.format(priceUsd)}
 			</span>
 		)
@@ -51,7 +51,7 @@ const CardItem = ({ card, image, rate, priority = false }: CardItemProps) => {
 					<img
 						src={imageUrl}
 						alt=''
-						className='rounded-md w-full h-full object-cover'
+						className='rounded-md w-full h-full'
 						loading={priority ? 'eager' : 'lazy'}
 						fetchPriority={priority ? 'high' : 'auto'}
 						decoding='async'
@@ -62,7 +62,7 @@ const CardItem = ({ card, image, rate, priority = false }: CardItemProps) => {
 				{/* 2 linhas reservadas: o que diferencia cartas da mesma família
 				    ("Infernoble Arms - Almace/Durendal") fica no fim do nome. */}
 				<h3
-					className='font-body text-base font-medium text-ink line-clamp-2 min-h-[2lh]'
+					className='font-body text-md font-medium text-ink line-clamp-2 min-h-[2lh]'
 					title={card.name}
 				>
 					{card.name}

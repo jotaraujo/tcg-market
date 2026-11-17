@@ -15,12 +15,12 @@ const CardSkeleton = () => {
 				<div className='h-12'>
 					<Skeleton data-testid='skeleton' className='h-4 w-3/4' />
 				</div>
-				<div className='flex h-[18px] items-center'>
+				<div className='flex h-18px items-center'>
 					<Skeleton data-testid='skeleton' className='h-3 w-1/2' />
 				</div>
 			</div>
 			<div className='mt-auto pt-3 border-t border-rule'>
-				<div className='flex h-[25px] items-center'>
+				<div className='flex h-25px items-center'>
 					<Skeleton data-testid='skeleton' className='h-3 w-1/3' />
 				</div>
 			</div>

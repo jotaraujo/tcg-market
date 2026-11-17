@@ -126,7 +126,7 @@ const CardGrid = ({ filters }: CardGridProps) => {
 			{hasNextPage && <div ref={sentinelRef} className='h-xs' />}
 
 			{/* Região viva: anuncia o carregamento e o fim da lista */}
-			<p role='status' className='py-lg text-center text-sm text-ink-3'>
+			<p role='status' className='py-5xl text-center text-sm text-ink-3'>
 				{isFetchingNextPage && 'Carregando mais cartas…'}
 				{!hasNextPage && `Fim da lista · ${cards.length} cartas`}
 			</p>
