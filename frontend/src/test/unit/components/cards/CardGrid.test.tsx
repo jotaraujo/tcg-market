@@ -3,6 +3,7 @@ import { HttpResponse, http } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 import CardGrid from '@/components/cards/CardGrid'
 import { useCards } from '@/hooks/useCards'
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import { makeCard } from '@/test/mocks/fixtures/cards'
 import { exchangeFixture } from '@/test/mocks/fixtures/exchange'
 import { server } from '@/test/mocks/server'
@@ -107,6 +108,21 @@ describe('CardGrid', () => {
 		).toBeInTheDocument()
 		// o estado vazio sugere o que fazer
 		expect(screen.getByText(/Tente outro nome/)).toBeInTheDocument()
+	})
+
+	// Regressão: o container do grid cresce até o fim do conteúdo (quem rola é o
+	// <main>), então usá-lo como root do IntersectionObserver deixava o sentinel
+	// "visível" para sempre e a paginação infinita parava na 2ª página.
+	it('should observe the sentinel against the viewport, not the grid container', async () => {
+		mockUseCards({ hasNextPage: true })
+
+		renderWithClient(<CardGrid filters={defaultFilters} />)
+		await screen.findByRole('list')
+
+		const options = vi.mocked(useIntersectionObserver).mock.calls.at(-1)?.[0]
+		expect(options).toBeDefined()
+		expect(options).not.toHaveProperty('containerRef')
+		expect(options).toMatchObject({ enabled: true })
 	})
 
 	it('should render the cards as a list so screen readers announce the count', async () => {

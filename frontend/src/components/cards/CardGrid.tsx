@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import { useRef } from 'react'
 import { useCards } from '@/hooks/useCards'
 import { useExchange } from '@/hooks/useExchange'
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
@@ -39,13 +38,13 @@ const CardGrid = ({ filters }: CardGridProps) => {
 
 	const { data: rate, isPending } = useExchange()
 
-	// Ref para o container de scroll que será passado ao hook
-	const containerRef = useRef<HTMLDivElement>(null)
-
+	// Sem containerRef: este container cresce até o fim do conteúdo
+	// e quem rola é o <main> do layout. Com root = viewport (padrão), o
+	// IntersectionObserver já respeita o recorte dos ancestrais com scroll; com
+	// o container como root o sentinel ficava "visível" para sempre.
 	const sentinelRef = useIntersectionObserver({
 		onIntersect: fetchNextPage,
 		enabled: hasNextPage,
-		containerRef,
 	})
 
 	if (isLoading || isPending) {
@@ -95,7 +94,6 @@ const CardGrid = ({ filters }: CardGridProps) => {
 
 	return (
 		<div
-			ref={containerRef}
 			className='flex-1 min-h-0 overflow-y-auto'
 			aria-busy={isFetchingNextPage}
 		>
