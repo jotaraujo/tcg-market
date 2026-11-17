@@ -41,6 +41,25 @@ describe('SetCombobox', () => {
 		).not.toBeInTheDocument()
 	})
 
+	it('should match the typed text as a substring, not as scattered letters', async () => {
+		const user = userEvent.setup()
+		render(<SetCombobox sets={sets} onSelect={vi.fn()} />)
+
+		await openList(user)
+		// "lgd" aparece em ordem, mas espalhado, em "Legendary Collection"
+		await user.type(
+			await screen.findByPlaceholderText('Nome ou código da coleção'),
+			'lgd',
+		)
+
+		expect(
+			await screen.findByText('Nenhuma coleção encontrada.'),
+		).toBeInTheDocument()
+		expect(
+			screen.queryByRole('option', { name: /Legendary Collection/ }),
+		).not.toBeInTheDocument()
+	})
+
 	it('should show the empty message when nothing matches', async () => {
 		const user = userEvent.setup()
 		render(<SetCombobox sets={sets} onSelect={vi.fn()} />)

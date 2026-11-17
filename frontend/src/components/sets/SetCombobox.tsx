@@ -21,6 +21,11 @@ interface SetComboboxProps {
 	onSelect: (name: string) => void
 }
 
+// O filtro padrão do cmdk é "fuzzy" (letras espalhadas): "LOB" traria ~130
+// coleções que só têm L, O e B em algum lugar. Aqui vale o trecho digitado.
+const matchesText = (value: string, search: string) =>
+	value.toLowerCase().includes(search.trim().toLowerCase()) ? 1 : 0
+
 // Busca por nome ou código. O `value` de cada item junta os dois para o filtro
 // do cmdk casar em qualquer um; a escolha usa o nome (único), não esse texto.
 const SetCombobox = ({ sets, value, onSelect }: SetComboboxProps) => {
@@ -46,7 +51,7 @@ const SetCombobox = ({ sets, value, onSelect }: SetComboboxProps) => {
 				</button>
 			</PopoverTrigger>
 			<PopoverContent>
-				<Command>
+				<Command filter={matchesText}>
 					<CommandInput placeholder='Nome ou código da coleção' />
 					<CommandList>
 						<CommandEmpty>Nenhuma coleção encontrada.</CommandEmpty>
