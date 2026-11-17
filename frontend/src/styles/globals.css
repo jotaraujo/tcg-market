@@ -1,0 +1,202 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Geist:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300..700&display=swap");
+@import "tailwindcss";
+
+@theme {
+	/* --- Surfaces (Paper) ----------------------------------- */
+	--color-paper: oklch(14% 0.012 295);
+	--color-paper-2: oklch(18% 0.014 295);
+	--color-paper-3: oklch(22% 0.016 295);
+
+	/* --- Text (Ink) ------------------------------------------ */
+	--color-ink: oklch(94% 0.008 295);
+	--color-ink-2: oklch(72% 0.01 295);
+	--color-ink-3: oklch(56% 0.01 295);
+
+	/* --- Structure ------------------------------------------- */
+	--color-rule: oklch(30% 0.01 295);
+	--color-subtle: oklch(56% 0.01 295);
+
+	/* --- Accent  --------------------------------------------- */
+	--color-brand: oklch(55% 0.2 295);
+	--color-brand-hover: oklch(62% 0.2 295);
+	--color-brand-ink: oklch(96% 0.008 295);
+	--color-focus: oklch(58% 0.22 295);
+
+	/* --- Semantic -------------------------------------------- */
+	--color-gold: oklch(78% 0.16 85);
+	--color-success: oklch(72% 0.18 145);
+	--color-danger: oklch(62% 0.2 25);
+
+	/* --- Typography ------------------------------------------ */
+	--font-display: "Space Grotesk", ui-sans-serif, system-ui;
+	--font-body: "Geist", ui-sans-serif, system-ui, sans-serif;
+	--font-outlier: "Geist Mono", ui-monospace, monospace;
+
+	/* --- Type Scale ------------------------------------------- */
+	--text-xs: 0.64rem;
+	--text-sm: 0.8rem;
+	--text-base: 1rem;
+	--text-md: 1.25rem;
+	--text-lg: 1.5625rem;
+	--text-xl: 1.9531rem;
+	--text-2xl: 2.4414rem;
+	--text-display: clamp(2.75rem, 5vw + 1rem, 4.5rem);
+
+	/* --- Spacing ---------------------------------------------- */
+	--spacing-3xs: 0.125rem;
+	--spacing-2xs: 0.25rem;
+	--spacing-xs: 0.5rem;
+	--spacing-sm: 0.75rem;
+	--spacing-md: 1rem;
+	--spacing-lg: 1.5rem;
+	--spacing-xl: 2.5rem;
+	--spacing-2xl: 4rem;
+	--spacing-3xl: 6rem;
+	--spacing-4xl: 8rem;
+	--spacing-5xl: 10rem;
+	--spacing-6xl: 15rem;
+	--spacing-7xl: 20rem;
+	--spacing-8xl: 25rem;
+	--spacing-9xl: 30rem;
+	--spacing-10xl: 35rem;
+
+	/* --- Border Radius --------------------------------------- */
+	--radius-card: 12px;
+	--radius-input: 8px;
+	--radius-pill: 999px;
+
+	/* --- Shadows --------------------------------------------- */
+	/* Glow do accent: mesmo hue/chroma do --color-brand, só com alpha. */
+	--shadow-glow-brand: 0 0 16px oklch(55% 0.2 295 / 0.5);
+	/* Menus flutuantes: sombra escura e difusa, sem cor (o canvas já é escuro). */
+	--shadow-menu: 0 12px 32px oklch(0% 0 0 / 0.5);
+
+	/* --- Motion ---------------------------------------------- */
+	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+	--ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+	--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+	--dur-micro: 120ms;
+	--dur-short: 220ms;
+	--dur-long: 420ms;
+
+	/* --- Mapeamento das Variáveis de Sistema do Shadcn (Tailwind v4) --- */
+	--color-background: var(--color-paper);
+	--color-foreground: var(--color-ink);
+
+	--color-text: var(--color-ink);
+	--color-text-foreground: var(--color-ink-2);
+	--color-text-muted: var(--color-ink-3);
+
+	--color-card: var(--color-paper-2);
+	--color-card-foreground: var(--color-ink);
+
+	--color-popover: var(--color-paper-2);
+	--color-popover-foreground: var(--color-ink);
+
+	--color-primary: var(--color-brand);
+	--color-primary-hover: var(--color-brand-hover);
+	--color-primary-foreground: var(--color-brand-ink);
+
+	--color-secondary: var(--color-paper-2);
+	--color-secondary-foreground: var(--color-ink); /* Corrigido o '--' duplo */
+
+	--color-muted: var(--color-paper-3);
+	--color-muted-foreground: var(--color-subtle);
+
+	--color-accent: var(--color-paper-3);
+	--color-accent-foreground: var(--color-ink);
+
+	--color-destructive: var(--color-danger);
+	--color-destructive-foreground: var(--color-ink);
+
+	--color-border: var(--color-rule);
+	--color-input: var(--color-paper-2);
+	--color-ring: var(--color-focus);
+
+	--radius-badge: var(--radius-card);
+
+	--color-panel: var(--color-paper-2);
+	--color-panel-surface: var(--color-paper-3);
+	--color-canvas: var(--color-paper-3);
+}
+
+/* Utilitários Customizados */
+.gold-glow {
+	text-shadow: 0 0 8px oklch(78% 0.16 85 / 0.3);
+}
+/* Hover de card: dois sinais, não três. Em fundo escuro a elevação vem da
+   luminosidade (paper-3), então não há sombra. O lift fica no Link (.card-link)
+   e não no article, para o anel de foco acompanhar o card quando ele sobe. */
+.card-link {
+	transition: transform var(--dur-short) var(--ease-out);
+}
+.card-link:hover {
+	transform: translateY(-2px);
+}
+.card-hover {
+	transition: background-color var(--dur-short) var(--ease-out);
+}
+.card-hover:hover,
+.card-link:hover .card-hover,
+.card-link:focus-visible .card-hover {
+	background-color: var(--color-paper-3);
+}
+.aspect-card {
+	aspect-ratio: 2.5 / 3.5;
+}
+.scrollbar-hide {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
+}
+
+@layer base {
+	body {
+		background-color: var(--color-background);
+		color: var(--color-foreground);
+		font-family: var(--font-body);
+		line-height: 1.55;
+		font-variant-numeric: tabular-nums;
+		color-scheme: dark;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-focus);
+		outline-offset: 2px;
+	}
+
+	h1,
+	h2,
+	h3,
+	.font-display {
+		font-family: var(--font-display);
+		letter-spacing: -0.03rem;
+		line-height: 1.15;
+		font-style: normal;
+	}
+
+	.font-outlier {
+		font-family: var(--font-outlier);
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* Aplica estilos padrão sem quebrar utilitários do Tailwind */
+	html,
+	body,
+	#root {
+		height: 100%;
+		margin: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*:not(.animate-spin, .animate-pulse),
+	*::before,
+	*::after {
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+		transition-duration: 150ms;
+	}
+}
