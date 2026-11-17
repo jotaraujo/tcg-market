@@ -16,10 +16,12 @@ const MarketplacePage = () => {
 	}
 
 	return (
-		<section className='flex flex-col gap-6 w-full p-6'>
+		<section className='flex flex-col gap-lg w-full p-lg'>
+			<h1 className='font-display text-2xl font-semibold tracking-tight text-ink'>
+				Mercado
+			</h1>
 			<FilterBar filters={filters} onChange={setFilters} />
 			<div className='flex flex-1 min-h-0 overflow-hidden'>
-				<h1></h1>
 				<CardGrid filters={combinedFilters} />
 			</div>
 		</section>

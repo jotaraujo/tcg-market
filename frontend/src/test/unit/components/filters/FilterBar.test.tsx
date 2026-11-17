@@ -2,12 +2,14 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import FilterBar from '@/components/filters/FilterBar'
+import { chooseOption } from '@/test/utils'
 import type { SelectableFilters } from '@/types/filters'
 
 const setup = (filters: SelectableFilters = {}) => {
+	const user = userEvent.setup()
 	const onChange = vi.fn()
 	render(<FilterBar filters={filters} onChange={onChange} />)
-	return { onChange }
+	return { user, onChange }
 }
 
 describe('FilterBar', () => {
@@ -19,87 +21,172 @@ describe('FilterBar', () => {
 		}
 	})
 
-	it('should start with "Todos" selected in the filters', () => {
+	it('should show only the filter name when nothing is chosen', () => {
 		setup()
 
-		expect(screen.getByRole('combobox', { name: 'Tipo' })).toHaveValue('')
-		expect(screen.getByRole('combobox', { name: 'Atributo' })).toHaveValue('')
+		expect(screen.getByRole('combobox', { name: 'Tipo' })).toHaveTextContent(
+			/^Tipo$/,
+		)
+		expect(
+			screen.getByRole('combobox', { name: 'Atributo' }),
+		).toHaveTextContent(/^Atributo$/)
 	})
 
-	it('should reflect the current filters in the selects', () => {
+	it('should reflect the current filters in the pills', () => {
 		setup({ type: 'Effect Monster', attribute: 'WATER', level: 4, sort: 'atk' })
 
-		expect(screen.getByRole('combobox', { name: 'Tipo' })).toHaveValue(
-			'Effect Monster',
+		expect(screen.getByRole('combobox', { name: 'Tipo' })).toHaveTextContent(
+			'Tipo: Effect Monster',
 		)
-		expect(screen.getByRole('combobox', { name: 'Atributo' })).toHaveValue(
-			'WATER',
+		expect(
+			screen.getByRole('combobox', { name: 'Atributo' }),
+		).toHaveTextContent('Atributo: WATER')
+		expect(screen.getByRole('combobox', { name: 'Nível' })).toHaveTextContent(
+			'Nível: 4',
 		)
-		expect(screen.getByRole('combobox', { name: 'Nível' })).toHaveValue('4')
-		expect(screen.getByRole('combobox', { name: 'Ordenar por' })).toHaveValue(
-			'atk',
-		)
+		expect(
+			screen.getByRole('combobox', { name: 'Ordenar por' }),
+		).toHaveTextContent('Ordenar: ATK')
 	})
 
 	it('should call onChange with the new filter when an option is chosen', async () => {
-		const { onChange } = setup({ sort: 'atk' })
+		const { user, onChange } = setup({ sort: 'atk' })
 
-		await userEvent.selectOptions(
-			screen.getByRole('combobox', { name: 'Atributo' }),
-			'WATER',
-		)
+		await chooseOption(user, 'Atributo', 'WATER')
 
 		expect(onChange).toHaveBeenCalledWith({ attribute: 'WATER', sort: 'atk' })
 	})
 
 	it('should send the level as a number', async () => {
-		const { onChange } = setup()
+		const { user, onChange } = setup()
 
-		await userEvent.selectOptions(
-			screen.getByRole('combobox', { name: 'Nível' }),
-			'4',
-		)
+		await chooseOption(user, 'Nível', '4')
 
 		expect(onChange).toHaveBeenCalledWith({ level: 4 })
 	})
 
 	it('should remove the filter when "Todos" is chosen again', async () => {
-		const { onChange } = setup({ attribute: 'WATER', level: 4 })
+		const { user, onChange } = setup({ attribute: 'WATER', level: 4 })
 
-		await userEvent.selectOptions(
-			screen.getByRole('combobox', { name: 'Atributo' }),
-			'',
-		)
+		await chooseOption(user, 'Atributo', 'Todos os atributos')
 
 		expect(onChange).toHaveBeenCalledWith({ level: 4 })
 	})
 
+	describe('lista de opções', () => {
+		it('should mark the current value as selected', async () => {
+			const { user } = setup({ attribute: 'WATER' })
+
+			await user.click(screen.getByRole('combobox', { name: 'Atributo' }))
+
+			expect(
+				await screen.findByRole('option', { name: 'WATER' }),
+			).toHaveAttribute('aria-selected', 'true')
+			expect(
+				screen.getByRole('option', { name: 'Todos os atributos' }),
+			).toHaveAttribute('aria-selected', 'false')
+		})
+
+		it('should group the types by Main Deck, Extra Deck and Outros', async () => {
+			const { user } = setup()
+
+			await user.click(screen.getByRole('combobox', { name: 'Tipo' }))
+
+			const list = await screen.findByRole('listbox')
+			for (const group of ['Main Deck', 'Extra Deck', 'Outros']) {
+				expect(within(list).getByText(group)).toBeInTheDocument()
+			}
+		})
+
+		it('should select the option with the keyboard', async () => {
+			const { user, onChange } = setup()
+
+			screen.getByRole('combobox', { name: 'Atributo' }).focus()
+			await user.keyboard('{Enter}')
+			await user.keyboard('{ArrowDown}{Enter}')
+
+			expect(onChange).toHaveBeenCalledWith({ attribute: 'DARK' })
+		})
+	})
+
 	describe('Spell e Trap', () => {
-		it('should disable attribute and level for a Spell Card type', () => {
+		it('should hide attribute and level for a Spell Card type', () => {
 			setup({ type: 'Spell Card' })
 
-			expect(screen.getByRole('combobox', { name: 'Atributo' })).toBeDisabled()
-			expect(screen.getByRole('combobox', { name: 'Nível' })).toBeDisabled()
+			expect(
+				screen.queryByRole('combobox', { name: 'Atributo' }),
+			).not.toBeInTheDocument()
+			expect(
+				screen.queryByRole('combobox', { name: 'Nível' }),
+			).not.toBeInTheDocument()
 			expect(screen.getByRole('combobox', { name: 'Tipo' })).toBeEnabled()
 		})
 
-		it('should only offer spell races for a Spell Card type', () => {
-			setup({ type: 'Spell Card' })
+		it('should hide attribute and level for a Trap Card type', () => {
+			setup({ type: 'Trap Card' })
 
-			const race = screen.getByRole('combobox', { name: 'Raça' })
 			expect(
-				within(race).getByRole('option', { name: 'Quick-Play' }),
-			).toBeInTheDocument()
+				screen.queryByRole('combobox', { name: 'Atributo' }),
+			).not.toBeInTheDocument()
 			expect(
-				within(race).queryByRole('option', { name: 'Dragon' }),
+				screen.queryByRole('combobox', { name: 'Nível' }),
 			).not.toBeInTheDocument()
 		})
 
-		it('should keep attribute and level enabled for a monster type', () => {
+		it('should only offer spell races for a Spell Card type', async () => {
+			const { user } = setup({ type: 'Spell Card' })
+
+			await user.click(screen.getByRole('combobox', { name: 'Raça' }))
+
+			const list = await screen.findByRole('listbox')
+			expect(
+				within(list).getByRole('option', { name: 'Quick-Play' }),
+			).toBeInTheDocument()
+			expect(
+				within(list).queryByRole('option', { name: 'Dragon' }),
+			).not.toBeInTheDocument()
+		})
+
+		it('should keep attribute and level available for a monster type', () => {
 			setup({ type: 'Effect Monster' })
 
 			expect(screen.getByRole('combobox', { name: 'Atributo' })).toBeEnabled()
 			expect(screen.getByRole('combobox', { name: 'Nível' })).toBeEnabled()
+		})
+	})
+
+	describe('pílulas ativas', () => {
+		it('should only offer a remove button for the active filters', () => {
+			setup({ type: 'Effect Monster' })
+
+			expect(
+				screen.getByRole('button', { name: 'Remover filtro Tipo' }),
+			).toBeInTheDocument()
+			expect(
+				screen.queryByRole('button', { name: 'Remover filtro Atributo' }),
+			).not.toBeInTheDocument()
+		})
+
+		it('should remove only that filter, keeping the others', async () => {
+			const { user, onChange } = setup({
+				attribute: 'WATER',
+				level: 4,
+				sort: 'atk',
+			})
+
+			await user.click(
+				screen.getByRole('button', { name: 'Remover filtro Atributo' }),
+			)
+
+			expect(onChange).toHaveBeenCalledWith({ level: 4, sort: 'atk' })
+		})
+
+		it('should not offer a remove button for the sort order', () => {
+			setup({ sort: 'atk' })
+
+			expect(
+				screen.queryByRole('button', { name: /^Remover filtro/ }),
+			).not.toBeInTheDocument()
 		})
 	})
 
@@ -112,53 +199,28 @@ describe('FilterBar', () => {
 			).not.toBeInTheDocument()
 		})
 
-		it('should show the clear button when only the sort order was changed', () => {
+		it('should not show the clear button when only the sort order was changed', () => {
 			setup({ sort: 'atk' })
 
 			expect(
-				screen.getByRole('button', { name: 'Limpar filtros' }),
-			).toBeInTheDocument()
+				screen.queryByRole('button', { name: 'Limpar filtros' }),
+			).not.toBeInTheDocument()
 		})
 
-		it('should clear every filter, including the sort order', async () => {
-			const { onChange } = setup({ type: 'Effect Monster', sort: 'atk' })
+		it('should clear every filter but keep the sort order', async () => {
+			const { user, onChange } = setup({ type: 'Effect Monster', sort: 'atk' })
 
-			await userEvent.click(
-				screen.getByRole('button', { name: 'Limpar filtros' }),
-			)
+			await user.click(screen.getByRole('button', { name: 'Limpar filtros' }))
+
+			expect(onChange).toHaveBeenCalledWith({ sort: 'atk' })
+		})
+
+		it('should clear to an empty object when there is no sort order', async () => {
+			const { user, onChange } = setup({ type: 'Effect Monster' })
+
+			await user.click(screen.getByRole('button', { name: 'Limpar filtros' }))
 
 			expect(onChange).toHaveBeenCalledWith({})
-		})
-	})
-
-	describe('painel no mobile', () => {
-		it('should toggle the panel with an accessible button', async () => {
-			setup()
-
-			const toggle = screen.getByRole('button', { name: /^Filtros/ })
-			expect(toggle).toHaveAttribute('aria-expanded', 'false')
-
-			await userEvent.click(toggle)
-			expect(toggle).toHaveAttribute('aria-expanded', 'true')
-
-			await userEvent.click(toggle)
-			expect(toggle).toHaveAttribute('aria-expanded', 'false')
-		})
-
-		it('should show how many filters are active on the toggle button', () => {
-			setup({ type: 'Effect Monster', level: 4, sort: 'atk' })
-
-			expect(
-				screen.getByRole('button', { name: 'Filtros, 2 ativos' }),
-			).toBeInTheDocument()
-		})
-
-		it('should not show a count when no filter is active', () => {
-			setup({ sort: 'atk' })
-
-			expect(
-				screen.getByRole('button', { name: 'Filtros' }),
-			).toBeInTheDocument()
 		})
 	})
 })

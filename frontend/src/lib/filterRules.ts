@@ -7,7 +7,7 @@ type FilterKey = keyof SelectableFilters
 
 // Spell e Trap não têm atributo nem nível: filtrar por eles junto com esses
 // tipos nunca devolve cartas (a API responde "nenhuma carta").
-const isSpellOrTrap = (type?: CardType) =>
+export const isSpellOrTrap = (type?: CardType) =>
 	type === 'Spell Card' || type === 'Trap Card'
 
 // A raça depende do tipo: "Quick-Play" só existe em Spell, "Counter" só em Trap
@@ -50,8 +50,12 @@ export const setFilter = (
 	return next
 }
 
-// A ordenação não é um filtro: o botão "Filtros" não deve contá-la.
+// A ordenação não é um filtro: não conta como ativo e "Limpar filtros" a preserva.
 export const countActiveFilters = (filters: SelectableFilters): number =>
 	Object.entries(filters).filter(
 		([key, value]) => key !== 'sort' && value !== undefined,
 	).length
+
+// Remove os filtros e mantém só a ordenação escolhida.
+export const clearFilters = (filters: SelectableFilters): SelectableFilters =>
+	filters.sort ? { sort: filters.sort } : {}

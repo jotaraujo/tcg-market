@@ -141,6 +141,17 @@
 .card-link:focus-visible .card-hover {
 	background-color: var(--color-paper-3);
 }
+/* Entrada de menus flutuantes: só opacidade e transform, curta. O fechamento
+   é imediato (sem animação de saída, o Radix desmonta na hora). */
+@keyframes menu-pop-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+}
+.menu-pop[data-state="open"] {
+	animation: menu-pop-in var(--dur-micro) var(--ease-out);
+}
 .aspect-card {
 	aspect-ratio: 2.5 / 3.5;
 }
