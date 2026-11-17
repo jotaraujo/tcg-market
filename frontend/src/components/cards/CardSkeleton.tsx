@@ -22,14 +22,14 @@ const CardSkeleton = () => {
 					<Skeleton data-testid='skeleton' className='h-4 w-3/4' />
 				</div>
 				{/* set: 1 linha */}
-				<div className='flex items-center font-body text-sm h-[1lh]'>
+				<div className='flex items-center font-body text-sm h-lh'>
 					<Skeleton data-testid='skeleton' className='h-3 w-1/2' />
 				</div>
 			</div>
 			{/* preço: o CardItem não define fonte no contêiner, então 1lh aqui é a
 			    linha do corpo, igual ao bloco real */}
 			<div className='mt-auto pt-3 border-t border-rule'>
-				<div className='flex items-center h-[1lh]'>
+				<div className='flex items-center h-lh'>
 					<Skeleton data-testid='skeleton' className='h-3 w-1/3' />
 				</div>
 			</div>
