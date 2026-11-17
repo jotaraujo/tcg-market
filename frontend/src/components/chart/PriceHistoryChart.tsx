@@ -1,11 +1,11 @@
 import {
-	LineChart,
+	CartesianGrid,
 	Line,
+	LineChart,
+	ResponsiveContainer,
+	Tooltip,
 	XAxis,
 	YAxis,
-	CartesianGrid,
-	Tooltip,
-	ResponsiveContainer,
 } from 'recharts'
 import type { PriceHistoryEntry } from '@/types/proxy'
 
@@ -21,17 +21,27 @@ const fmtPrice = (v: number) =>
 		maximumFractionDigits: 2,
 	}).format(v)
 
+// "07/11": curto o bastante para o eixo X não encavalar no mobile
 const fmtDate = (iso: string) =>
-	new Date(iso).toLocaleDateString('en-US', {
-		month: 'short',
-		day: 'numeric',
+	new Date(iso).toLocaleDateString('pt-BR', {
+		day: '2-digit',
+		month: '2-digit',
 		timeZone: 'UTC',
 	})
+
+// Cores vêm dos tokens (globals.css): linha = accent, grade = rule, tooltip =
+// gold (preço é o único dado dourado do sistema). Fundo transparente: o painel
+// que envolve o gráfico faz o trabalho.
+const AXIS = {
+	tick: { fill: 'var(--color-ink-2)', fontSize: 12 },
+	tickLine: false,
+	axisLine: { stroke: 'var(--color-rule)' },
+} as const
 
 export const PriceHistoryChart = ({ data }: Props) => {
 	if (!data || data.length === 0) {
 		return (
-			<div className='flex items-center justify-center h-300px text-gray-500'>
+			<div className='flex h-[300px] items-center justify-center text-ink-2'>
 				Histórico de preços indisponível para esta carta.
 			</div>
 		)
@@ -46,17 +56,31 @@ export const PriceHistoryChart = ({ data }: Props) => {
 		<ResponsiveContainer width='100%' height={300}>
 			<LineChart
 				data={chartData}
-				margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+				margin={{ top: 10, right: 16, left: 0, bottom: 0 }}
 			>
-				<CartesianGrid strokeDasharray='3 3' />
-				<XAxis dataKey='date' />
+				<CartesianGrid stroke='var(--color-rule)' vertical={false} />
+				<XAxis dataKey='date' {...AXIS} />
 				<YAxis
+					{...AXIS}
+					domain={['auto', 'auto']}
 					tickFormatter={(v: number | undefined) =>
 						v === undefined ? '' : `$${v.toFixed(2)}`
 					}
-					width={60}
+					width={64}
 				/>
 				<Tooltip
+					cursor={{ stroke: 'var(--color-rule)' }}
+					contentStyle={{
+						background: 'var(--color-paper-3)',
+						border: '1px solid var(--color-rule)',
+						borderRadius: 'var(--radius-input)',
+						color: 'var(--color-ink)',
+					}}
+					labelStyle={{ color: 'var(--color-ink-2)' }}
+					itemStyle={{
+						color: 'var(--color-gold)',
+						fontFamily: 'var(--font-outlier)',
+					}}
 					formatter={
 						((value: any) => [
 							fmtPrice(Number(Array.isArray(value) ? value[0] : value) || 0),
@@ -68,10 +92,20 @@ export const PriceHistoryChart = ({ data }: Props) => {
 				<Line
 					type='monotone'
 					dataKey='price'
-					stroke='#2563eb'
+					stroke='var(--color-primary)'
 					strokeWidth={2}
-					dot={{ r: 3 }}
-					activeDot={{ r: 6 }}
+					dot={{
+						r: 3,
+						fill: 'var(--color-primary)',
+						stroke: 'var(--color-paper-2)',
+						strokeWidth: 2,
+					}}
+					activeDot={{
+						r: 5,
+						fill: 'var(--color-gold)',
+						stroke: 'var(--color-paper-2)',
+						strokeWidth: 2,
+					}}
 				/>
 			</LineChart>
 		</ResponsiveContainer>

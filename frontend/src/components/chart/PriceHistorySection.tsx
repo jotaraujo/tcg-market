@@ -1,3 +1,4 @@
+import { AlertCircle, Info } from 'lucide-react'
 import { PriceHistoryChart } from '@/components/chart/PriceHistoryChart'
 import type { PriceHistoryEntry, PriceHistoryStatus } from '@/types/proxy'
 
@@ -17,11 +18,23 @@ interface Props {
 
 export const PriceHistorySection = ({ status, history }: Props) => {
 	if (status === 'ok') return <PriceHistoryChart data={history} />
+
+	// Só "unavailable" é falha de verdade; os outros são estados válidos (a carta
+	// só não tem histórico), então não usam a cor de erro.
+	const isFailure = status === 'unavailable'
+	const Icon = isFailure ? AlertCircle : Info
+
 	return (
 		<p
-			role={status === 'unavailable' ? 'alert' : 'status'}
-			className='text-gray-500'
+			role={isFailure ? 'alert' : 'status'}
+			className='flex min-h-[300px] items-center justify-center gap-sm rounded-input border border-dashed border-rule px-lg text-center text-ink-2'
 		>
+			<Icon
+				aria-hidden='true'
+				className={
+					isFailure ? 'size-5 shrink-0 text-danger' : 'size-5 shrink-0'
+				}
+			/>
 			{MESSAGES[status]}
 		</p>
 	)

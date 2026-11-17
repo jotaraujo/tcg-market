@@ -124,6 +124,20 @@
 .gold-glow {
 	text-shadow: 0 0 8px oklch(78% 0.16 85 / 0.3);
 }
+/* Mesmo glow em texto grande (preço do detalhe): o blur de 12px só funciona
+   acima de ~24px; em texto pequeno ele borra os dígitos (ver .gold-glow). */
+.gold-glow-lg {
+	text-shadow: 0 0 12px oklch(78% 0.16 85 / 0.3);
+}
+/* Entrada do conteúdo depois do skeleton: só opacidade, curta. */
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+}
+.fade-in {
+	animation: fade-in var(--dur-long) var(--ease-out);
+}
 /* Hover de card: dois sinais, não três. Em fundo escuro a elevação vem da
    luminosidade (paper-3), então não há sombra. O lift fica no Link (.card-link)
    e não no article, para o anel de foco acompanhar o card quando ele sobe. */
