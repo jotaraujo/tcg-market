@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 import SetsPage from '@/pages/SetsPage'
 import { SETS_URL, setsFixture } from '@/test/mocks/fixtures/sets'
 import { server } from '@/test/mocks/server'
-import { renderWithClient } from '@/test/utils'
+import { chooseOption, renderWithClient } from '@/test/utils'
 
 // O jsdom não tem IntersectionObserver e a paginação não é o foco aqui.
 vi.mock('@/hooks/useIntersectionObserver', () => ({
@@ -54,7 +54,8 @@ describe('SetsPage', () => {
 		const user = userEvent.setup()
 		renderWithClient(<Harness />)
 
-		await user.click(await screen.findByRole('button', { name: '2020' }))
+		await screen.findByRole('list', { name: 'Lançamentos recentes' })
+		await chooseOption(user, 'Ano de lançamento', '2020')
 
 		expect(
 			screen.getByRole('heading', { name: 'Coleções de 2020' }),
@@ -79,7 +80,7 @@ describe('SetsPage', () => {
 			screen.queryByRole('list', { name: 'Lançamentos recentes' }),
 		).not.toBeInTheDocument()
 		expect(
-			screen.queryByRole('group', { name: 'Ano de lançamento' }),
+			screen.queryByRole('combobox', { name: 'Ano de lançamento' }),
 		).not.toBeInTheDocument()
 	})
 
@@ -158,16 +159,16 @@ describe('SetsPage', () => {
 		const user = userEvent.setup()
 		renderWithClient(<Harness />)
 
-		await user.click(await screen.findByRole('button', { name: '2020' }))
+		await screen.findByRole('list', { name: 'Lançamentos recentes' })
+		await chooseOption(user, 'Ano de lançamento', '2020')
 		await user.click(await tile(/Duelist Pack: Test/))
 		await user.click(
 			await screen.findByRole('button', { name: 'Trocar coleção' }),
 		)
 
-		expect(await screen.findByRole('button', { name: '2020' })).toHaveAttribute(
-			'aria-pressed',
-			'true',
-		)
+		expect(
+			await screen.findByRole('combobox', { name: 'Ano de lançamento' }),
+		).toHaveTextContent('2020')
 	})
 
 	it('should show the empty state for a set with no cards', async () => {

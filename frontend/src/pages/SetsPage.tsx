@@ -3,7 +3,7 @@ import CardGrid from '@/components/cards/CardGrid'
 import SetCombobox from '@/components/sets/SetCombobox'
 import SetHeader from '@/components/sets/SetHeader'
 import SetTile from '@/components/sets/SetTile'
-import YearChips from '@/components/sets/YearChips'
+import YearSelect from '@/components/sets/YearSelect'
 import ErrorState from '@/components/ui/ErrorState'
 import Skeleton from '@/components/ui/Skeleton'
 import { useSets } from '@/hooks/useSets'
@@ -128,12 +128,14 @@ const SetsPage = ({ selectedName, onSelectSet }: SetsPageProps) => {
 
 		return (
 			<>
-				{combobox}
-				<YearChips
-					years={getSetYears(sets, today)}
-					selected={year}
-					onChange={setYear}
-				/>
+				<div className='flex flex-wrap items-center gap-sm'>
+					{combobox}
+					<YearSelect
+						years={getSetYears(sets, today)}
+						selected={year}
+						onChange={setYear}
+					/>
+				</div>
 				<h2 className='font-display text-xl font-semibold text-ink'>{title}</h2>
 				<ul aria-label={title} className={TILES_GRID_CLASSES}>
 					{tiles.map((set) => (
