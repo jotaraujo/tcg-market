@@ -25,8 +25,11 @@ vi.mock('@/hooks/useIntersectionObserver', () => ({
 
 // 2. Mock do Link para evitar dependência do RouterProvider
 vi.mock('@tanstack/react-router', () => ({
-	Link: ({ to, params, children }: any) => {
-		const href = params ? to.replace('$id', params.id) : to
+	Link: ({ to, params, search, children }: any) => {
+		// O search entra no href como query string, como o router faria
+		const query = new URLSearchParams(search ?? {}).toString()
+		const path = params ? to.replace('$id', params.id) : to
+		const href = query ? `${path}?${query}` : path
 		return (
 			<a href={href} data-testid='card-link'>
 				{children}
@@ -186,6 +189,29 @@ describe('CardGrid', () => {
 		// Verifica se existe um link com href="/card/123"
 		const link = screen.getByTestId('card-link')
 		expect(link).toHaveAttribute('href', '/card/123')
+	})
+
+	it('should open the card on the printing of the selected set', async () => {
+		mockUseCards()
+
+		renderWithClient(<CardGrid filters={{ cardset: 'Legendary Collection' }} />)
+
+		// makeCard(123): a impressão da Legendary Collection é LC01-EN123, Ultra Rare
+		expect(await screen.findByTestId('card-link')).toHaveAttribute(
+			'href',
+			'/card/123?setCode=LC01-EN123&rarity=Ultra+Rare',
+		)
+	})
+
+	it('should not add search params without a set filter', async () => {
+		mockUseCards()
+
+		renderWithClient(<CardGrid filters={{}} />)
+
+		expect(await screen.findByTestId('card-link')).toHaveAttribute(
+			'href',
+			'/card/123',
+		)
 	})
 
 	describe('câmbio USD → R$', () => {

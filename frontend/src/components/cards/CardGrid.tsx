@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { useCards } from '@/hooks/useCards'
 import { useExchange } from '@/hooks/useExchange'
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
+import { getSetPrinting } from '@/lib/sets'
 import type { CardFilters } from '@/types/filters'
 import ErrorState from '../ui/ErrorState'
 import CardItem from './CardItem'
@@ -103,6 +104,8 @@ const CardGrid = ({ filters }: CardGridProps) => {
 						<Link
 							to='/card/$id'
 							params={{ id: String(card.id) }}
+							// Dentro de uma coleção, o detalhe abre na impressão dela
+							search={getSetPrinting(card, filters.cardset) ?? {}}
 							className='card-link block h-full rounded-card'
 						>
 							<CardItem
