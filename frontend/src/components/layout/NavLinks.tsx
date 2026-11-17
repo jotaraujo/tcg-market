@@ -11,7 +11,7 @@ const NavLinks = () => {
 					className='flex gap-1 text-sm font-medium text-ink transition-all duration-400'
 					activeProps={{
 						className:
-							'bg-primary text-ink font-semibold px-3 py-2 rounded-pill shadow-glow-brand',
+							'bg-primary text-primary-foreground font-semibold px-3 py-2 rounded-pill shadow-glow-brand',
 					}}
 				>
 					<Icon className='w-4 h-4' />

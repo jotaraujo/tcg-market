@@ -10,9 +10,12 @@ export interface UnifiedCardMetadata {
 	type: string
 	race: string
 	attribute?: string
-	level?: number
+	level?: number // Para Xyz, a API usa este campo como Rank
+	scale?: number // Escala de Pêndulo
 	atk?: number
 	def?: number
+	linkval?: number // Valor Link (monstros Link não têm def nem level)
+	linkmarkers?: string[] // Ex.: 'Top-Left', 'Top', 'Bottom-Right'
 	imageUrl: string
 	currentPrice: string
 }

@@ -1,6 +1,6 @@
 import Skeleton from '../ui/Skeleton'
 
-// Espelha o CardItem (moldura, arte 2,5:3,5, nome, set e bloco de preço) para
+// Espelha o CardItem (moldura, arte 421:614, nome, set e bloco de preço) para
 // que a troca skeleton → carta não gere layout shift.
 //
 // As alturas das linhas não são números fixos: cada wrapper usa as MESMAS

@@ -51,7 +51,7 @@ const CardItem = ({ card, image, rate, priority = false }: CardItemProps) => {
 					<img
 						src={imageUrl}
 						alt=''
-						className='rounded-md w-full h-full'
+						className='rounded-md w-full h-full object-cover'
 						loading={priority ? 'eager' : 'lazy'}
 						fetchPriority={priority ? 'high' : 'auto'}
 						decoding='async'
@@ -61,12 +61,12 @@ const CardItem = ({ card, image, rate, priority = false }: CardItemProps) => {
 			<div className='flex flex-col grow gap-sm'>
 				{/* 2 linhas reservadas: o que diferencia cartas da mesma família
 				    ("Infernoble Arms - Almace/Durendal") fica no fim do nome. */}
-				<h3
+				<h2
 					className='font-body text-md font-medium text-ink line-clamp-2 min-h-[2lh]'
 					title={card.name}
 				>
 					{card.name}
-				</h3>
+				</h2>
 				<p className='font-body text-sm text-text-foreground line-clamp-1'>
 					{setName}
 				</p>

@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select'
 import { useExchange } from '@/hooks/useExchange'
 import { useTCGData } from '@/hooks/useTCGData'
+import { getCardStats } from '@/lib/cardStats'
 import { getPriceVariation } from '@/lib/priceVariation'
 import type { Printing } from '@/types/proxy'
 
@@ -82,14 +83,7 @@ const CardDetail = () => {
 	const tags = [metadata.type, metadata.race, metadata.attribute].filter(
 		(tag): tag is string => Boolean(tag),
 	)
-	const stats = [
-		{ label: 'ATK', value: metadata.atk },
-		{ label: 'DEF', value: metadata.def },
-		{ label: 'Nível', value: metadata.level },
-	].filter(
-		(stat): stat is { label: string; value: number } =>
-			stat.value !== undefined,
-	)
+	const stats = getCardStats(metadata)
 
 	return (
 		<div

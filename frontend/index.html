@@ -1,10 +1,32 @@
-
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>tcg-market</title>
+    <meta
+      name="description"
+      content="Acompanhe o preço atual e o histórico de cartas de Yu-Gi-Oh! com busca, filtros e cotação em reais."
+    />
+    <meta name="theme-color" content="#1a1822" />
+    <title>TCG Market</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://db.ygoprodeck.com" crossorigin />
+    <link rel="preconnect" href="https://api.frankfurter.dev" crossorigin />
+    <link rel="preconnect" href="https://images.ygoprodeck.com" />
+    <script>
+      // A 1ª página do mercado (sem filtros) sempre pede esta URL. Começar o
+      // download aqui, antes do JS executar, tira a API do caminho crítico do
+      // LCP; o fetch() do React reaproveita a resposta do preload.
+      // Se a URL de fetchCards mudar (parâmetros padrão), mude aqui também.
+      if (/^\/(marketplace\/?)?$/.test(location.pathname)) {
+        var l = document.createElement('link')
+        l.rel = 'preload'
+        l.as = 'fetch'
+        l.crossOrigin = 'anonymous'
+        l.href = 'https://db.ygoprodeck.com/api/v7/cardinfo.php?num=20&offset=0'
+        document.head.appendChild(l)
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
