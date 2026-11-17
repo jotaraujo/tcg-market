@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 const Select = SelectPrimitive.Root
 const SelectTrigger = SelectPrimitive.Trigger
 const SelectGroup = SelectPrimitive.Group
+const SelectValue = SelectPrimitive.Value
 
 function SelectContent({
 	className,
@@ -95,6 +96,7 @@ function SelectSeparator({
 export {
 	Select,
 	SelectTrigger,
+	SelectValue,
 	SelectContent,
 	SelectGroup,
 	SelectItem,

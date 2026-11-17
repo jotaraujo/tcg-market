@@ -1,15 +1,46 @@
 // src/pages/CardDetail.tsx
-import { useNavigate, useParams, useSearch } from '@tanstack/react-router'
-import ErrorState from '@/components/ui/ErrorState'
-import LoadingState from '@/components/ui/LoadingState'
+import { Link, useNavigate, useParams, useSearch } from '@tanstack/react-router'
+import { ArrowLeft, ChevronDown } from 'lucide-react'
 import { PriceHistorySection } from '@/components/chart/PriceHistorySection'
+import { PriceVariationBadge } from '@/components/chart/PriceVariationBadge'
+import CardDetailSkeleton from '@/components/cards/CardDetailSkeleton'
+import {
+	DETAIL_ART_COL,
+	DETAIL_ART_FRAME,
+	DETAIL_CONTAINER,
+	DETAIL_GRID,
+	DETAIL_INFO_COL,
+	DETAIL_PANEL,
+} from '@/components/cards/cardDetailLayout'
+import ErrorState from '@/components/ui/ErrorState'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
+import { useExchange } from '@/hooks/useExchange'
 import { useTCGData } from '@/hooks/useTCGData'
+import { getPriceVariation } from '@/lib/priceVariation'
 import type { Printing } from '@/types/proxy'
 
-const fmtPrice = (v: string | number) =>
-	new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-		Number(v) || 0,
-	)
+const formatUsd = new Intl.NumberFormat('en-US', {
+	style: 'currency',
+	currency: 'USD',
+})
+
+const formatBrl = new Intl.NumberFormat('pt-BR', {
+	style: 'currency',
+	currency: 'BRL',
+})
+
+const formatDay = (iso: string) =>
+	new Date(iso).toLocaleDateString('pt-BR', {
+		day: '2-digit',
+		month: '2-digit',
+		timeZone: 'UTC',
+	})
 
 const printingKey = (p: Pick<Printing, 'setCode' | 'rarity'>) =>
 	`${p.setCode}|${p.rarity}`
@@ -19,15 +50,20 @@ const CardDetail = () => {
 	const { setCode, rarity } = useSearch({ from: '/card/$id' })
 	const navigate = useNavigate({ from: '/card/$id' })
 
-	const { data, isLoading, isError, isPlaceholderData } = useTCGData(id, {
-		setCode,
-		rarity,
-	})
+	const { data, isLoading, isError, isPlaceholderData, refetch, isRefetching } =
+		useTCGData(id, { setCode, rarity })
+	// Mesma cotação (e o mesmo "≈") que o grid mostra; se falhar, só some a linha em R$
+	const { data: rate } = useExchange()
 
-	if (isLoading)
-		return <LoadingState message='Carregando detalhes da carta...' />
+	if (isLoading) return <CardDetailSkeleton />
 	if (isError || !data)
-		return <ErrorState message='Não foi possível carregar os dados da carta.' />
+		return (
+			<ErrorState
+				message='Não foi possível carregar os dados da carta.'
+				onRetry={() => refetch()}
+				isRetrying={isRefetching}
+			/>
+		)
 
 	const {
 		metadata,
@@ -36,8 +72,11 @@ const CardDetail = () => {
 		priceHistory,
 		priceHistoryStatus,
 	} = data
-	const latestPrice =
-		priceHistoryStatus === 'ok' ? priceHistory.at(-1)?.price : undefined
+	const hasHistory = priceHistoryStatus === 'ok'
+	const latestPrice = hasHistory ? priceHistory.at(-1)?.price : undefined
+	// Preço 0 (ou ausente) é "sem preço", como no grid, e não "US$ 0,00"
+	const priceUsd = latestPrice ?? (Number(metadata.currentPrice) || null)
+	const variation = hasHistory ? getPriceVariation(priceHistory) : null
 
 	const handlePrintingChange = (key: string) => {
 		const next = printings.find((p) => printingKey(p) === key)
@@ -48,89 +87,172 @@ const CardDetail = () => {
 			})
 	}
 
+	const tags = [metadata.type, metadata.race, metadata.attribute].filter(
+		(tag): tag is string => Boolean(tag),
+	)
+	const stats = [
+		{ label: 'ATK', value: metadata.atk },
+		{ label: 'DEF', value: metadata.def },
+		{ label: 'Nível', value: metadata.level },
+	].filter(
+		(stat): stat is { label: string; value: number } =>
+			stat.value !== undefined,
+	)
+
 	return (
-		<div className='container grid grid-cols-1 md:grid-cols-2 mx-auto p-4 gap-8'>
-			<div className='flex flex-col items-center'>
-				<img
-					src={metadata.imageUrl}
-					alt={metadata.name}
-					className='w-64 rounded-lg shadow-2xl'
-					loading='lazy'
-				/>
-				<h2 className='text-3xl font-bold mt-4'>{metadata.name}</h2>
-				<div className='flex gap-4 mt-2 text-gray-600'>
-					{metadata.atk !== undefined && <span>ATK: {metadata.atk}</span>}
-					{metadata.def !== undefined && <span>DEF: {metadata.def}</span>}
-				</div>
-			</div>
-
-			<div
-				className='bg-white p-6 rounded-xl shadow-sm border'
-				aria-busy={isPlaceholderData}
+		<div className={`${DETAIL_CONTAINER} fade-in flex flex-col gap-lg`}>
+			<Link
+				to='/marketplace'
+				className='inline-flex w-fit items-center gap-xs text-sm text-ink-2 transition-colors duration-(--dur-short) hover:text-ink'
 			>
-				<h3 className='text-xl font-semibold mb-4'>Detalhes da Carta</h3>
-				<dl className='grid grid-cols-2 gap-2 text-sm mb-6'>
-					<dt className='font-medium text-gray-500'>Tipo</dt>
-					<dd>{metadata.type}</dd>
-					<dt className='font-medium text-gray-500'>Raça</dt>
-					<dd>{metadata.race}</dd>
-					{metadata.attribute && (
-						<>
-							<dt className='font-medium text-gray-500'>Atributo</dt>
-							<dd>{metadata.attribute}</dd>
-						</>
-					)}
-					{metadata.level !== undefined && (
-						<>
-							<dt className='font-medium text-gray-500'>Nível</dt>
-							<dd>{metadata.level}</dd>
-						</>
-					)}
-					<dt className='font-medium text-gray-500'>
-						{latestPrice !== undefined
-							? 'Último preço (Near Mint)'
-							: 'Preço (menor entre versões)'}
-					</dt>
-					<dd className='font-bold text-green-600'>
-						{fmtPrice(latestPrice ?? metadata.currentPrice)}
-					</dd>
-				</dl>
+				<ArrowLeft aria-hidden='true' className='size-4' />
+				Voltar ao mercado
+			</Link>
 
-				{printings.length > 0 && (
-					<div className='mb-6'>
-						<label
-							htmlFor='printing'
-							className='block text-sm font-medium text-gray-500 mb-1'
-						>
-							Impressão
-						</label>
-						<select
-							id='printing'
-							className='w-full border rounded-md px-2 py-1 text-sm'
-							value={selectedPrinting ? printingKey(selectedPrinting) : ''}
-							onChange={(e) => handlePrintingChange(e.target.value)}
-						>
-							{printings.map((p) => (
-								<option key={printingKey(p)} value={printingKey(p)}>
-									{p.setCode} · {p.rarity} ({p.setName})
-								</option>
-							))}
-						</select>
+			<div className={DETAIL_GRID}>
+				<div className={DETAIL_ART_COL}>
+					<div className={DETAIL_ART_FRAME}>
+						<img
+							src={metadata.imageUrl}
+							alt={metadata.name}
+							className='size-full'
+							// É a maior imagem da página: carrega já (protege o LCP)
+							fetchPriority='high'
+							decoding='async'
+						/>
 					</div>
-				)}
+				</div>
 
-				<h3 className='text-xl font-semibold mb-4'>
-					Histórico de Preço (30 dias)
-				</h3>
-				<div
-					className={
-						isPlaceholderData ? 'opacity-60 transition-opacity' : undefined
-					}
-				>
-					<PriceHistorySection
-						status={priceHistoryStatus}
-						history={priceHistory}
-					/>
+				<div className={DETAIL_INFO_COL}>
+					<header className='flex flex-col gap-sm'>
+						{tags.length > 0 && (
+							<ul className='flex flex-wrap gap-xs' aria-label='Classificação'>
+								{tags.map((tag) => (
+									<li
+										key={tag}
+										className='rounded-pill border border-rule bg-panel px-sm py-2xs text-sm text-ink-2'
+									>
+										{tag}
+									</li>
+								))}
+							</ul>
+						)}
+						<h1 className='font-display text-2xl font-semibold text-balance text-ink [overflow-wrap:anywhere]'>
+							{metadata.name}
+						</h1>
+					</header>
+
+					{stats.length > 0 && (
+						<dl className='grid grid-cols-[repeat(auto-fit,minmax(6rem,1fr))] gap-sm'>
+							{stats.map(({ label, value }) => (
+								<div
+									key={label}
+									className='flex flex-col rounded-input border border-rule bg-panel px-md py-sm'
+								>
+									<dt className='text-sm text-ink-2'>{label}</dt>
+									<dd className='font-display text-lg font-semibold text-ink'>
+										{value}
+									</dd>
+								</div>
+							))}
+						</dl>
+					)}
+
+					<section
+						aria-labelledby='price-label'
+						aria-busy={isPlaceholderData}
+						className={`${DETAIL_PANEL} flex flex-col gap-md`}
+					>
+						<div className='flex flex-wrap items-end justify-between gap-md'>
+							<div className='flex flex-col'>
+								<p id='price-label' className='text-sm text-ink-2'>
+									{latestPrice !== undefined
+										? 'Último preço (Near Mint)'
+										: 'Preço (menor entre versões)'}
+								</p>
+								{priceUsd === null ? (
+									<p className='text-2xl text-ink-2'>Sem preço</p>
+								) : (
+									<>
+										<p className='font-outlier text-2xl font-medium text-gold gold-glow-lg'>
+											{formatUsd.format(priceUsd)}
+										</p>
+										{rate !== undefined && (
+											<p className='text-sm text-ink-2'>
+												≈ {formatBrl.format(priceUsd * rate)}
+											</p>
+										)}
+									</>
+								)}
+							</div>
+							{variation && (
+								<div className='flex flex-col items-end gap-2xs'>
+									<PriceVariationBadge variation={variation} />
+									<span className='text-sm text-ink-2'>no período</span>
+								</div>
+							)}
+						</div>
+
+						{printings.length > 0 && (
+							<div className='flex flex-col gap-xs'>
+								<label htmlFor='printing' className='text-sm text-ink-2'>
+									Impressão
+								</label>
+								<Select
+									value={selectedPrinting ? printingKey(selectedPrinting) : ''}
+									onValueChange={handlePrintingChange}
+								>
+									<SelectTrigger
+										id='printing'
+										className='flex h-11 w-full cursor-pointer items-center justify-between gap-sm rounded-input border border-rule bg-paper px-sm text-left text-sm text-ink transition-colors duration-(--dur-short) hover:bg-paper-3 focus-visible:outline-2 focus-visible:outline-focus data-[state=open]:bg-paper-3'
+									>
+										<SelectValue
+											placeholder='Escolha uma impressão'
+											className='min-w-0 truncate'
+										/>
+										<ChevronDown
+											aria-hidden='true'
+											className='size-4 shrink-0 text-ink-2'
+										/>
+									</SelectTrigger>
+									<SelectContent aria-label='Impressões' className='max-w-none'>
+										{printings.map((p) => (
+											<SelectItem key={printingKey(p)} value={printingKey(p)}>
+												{p.setCode} · {p.rarity} ({p.setName})
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+						)}
+					</section>
+
+					<section aria-labelledby='history-title' className={DETAIL_PANEL}>
+						<div className='mb-md flex flex-wrap items-baseline justify-between gap-xs'>
+							<h2
+								id='history-title'
+								className='font-display text-md font-semibold text-ink'
+							>
+								Histórico de preço
+							</h2>
+							{hasHistory && priceHistory.length >= 2 && (
+								<p className='text-sm text-ink-2'>
+									{formatDay(priceHistory[0].date)} –{' '}
+									{formatDay(priceHistory[priceHistory.length - 1].date)}
+								</p>
+							)}
+						</div>
+						<div
+							className={
+								isPlaceholderData ? 'opacity-60 transition-opacity' : undefined
+							}
+						>
+							<PriceHistorySection
+								status={priceHistoryStatus}
+								history={priceHistory}
+							/>
+						</div>
+					</section>
 				</div>
 			</div>
 		</div>
