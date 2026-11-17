@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
-import { cn } from 'cn'
+import { cn } from '@/lib/utils'
 import { Search } from 'lucide-react'
 import { type KeyboardEvent, type Ref, useEffect, useId, useState } from 'react'
 import { Input } from '@/components/ui/input'
