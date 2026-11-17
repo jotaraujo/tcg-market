@@ -105,6 +105,59 @@ describe('CardGrid', () => {
 		expect(
 			await screen.findByText('Nenhuma carta encontrada.'),
 		).toBeInTheDocument()
+		// o estado vazio sugere o que fazer
+		expect(screen.getByText(/Tente outro nome/)).toBeInTheDocument()
+	})
+
+	it('should render the cards as a list so screen readers announce the count', async () => {
+		mockUseCards()
+
+		renderWithClient(<CardGrid filters={defaultFilters} />)
+
+		expect(await screen.findByRole('list')).toBeInTheDocument()
+		expect(screen.getAllByRole('listitem')).toHaveLength(1)
+	})
+
+	it('should load only the first cards eagerly and the rest lazily', async () => {
+		const many = Array.from({ length: 8 }, (_, i) => makeCard(i + 1))
+		mockUseCards({ data: { pages: [{ data: many }] } })
+
+		const { container } = renderWithClient(
+			<CardGrid filters={defaultFilters} />,
+		)
+		await screen.findByRole('list')
+
+		const imgs = [...container.querySelectorAll('img')]
+		expect(imgs).toHaveLength(8)
+		expect(
+			imgs.slice(0, 6).every((i) => i.getAttribute('loading') === 'eager'),
+		).toBe(true)
+		expect(
+			imgs.slice(6).every((i) => i.getAttribute('loading') === 'lazy'),
+		).toBe(true)
+	})
+
+	it('should show skeletons and announce it while the next page loads', async () => {
+		mockUseCards({ hasNextPage: true, isFetchingNextPage: true })
+
+		renderWithClient(<CardGrid filters={defaultFilters} />)
+
+		await screen.findByRole('list')
+		expect(screen.getByRole('status')).toHaveTextContent(
+			'Carregando mais cartas…',
+		)
+		expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0)
+	})
+
+	it('should show the end-of-list message when there are no more pages', async () => {
+		mockUseCards({ hasNextPage: false })
+
+		renderWithClient(<CardGrid filters={defaultFilters} />)
+
+		await screen.findByRole('list')
+		expect(screen.getByRole('status')).toHaveTextContent(
+			'Fim da lista · 1 cartas',
+		)
 	})
 
 	it('should render cards and their links when data is available', async () => {

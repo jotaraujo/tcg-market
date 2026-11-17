@@ -122,14 +122,24 @@
 
 /* Utilitários Customizados */
 .gold-glow {
-	text-shadow: 0 0 12px oklch(78% 0.16 85 / 0.4);
+	text-shadow: 0 0 8px oklch(78% 0.16 85 / 0.3);
+}
+/* Hover de card: dois sinais, não três. Em fundo escuro a elevação vem da
+   luminosidade (paper-3), então não há sombra. O lift fica no Link (.card-link)
+   e não no article, para o anel de foco acompanhar o card quando ele sobe. */
+.card-link {
+	transition: transform var(--dur-short) var(--ease-out);
+}
+.card-link:hover {
+	transform: translateY(-2px);
 }
 .card-hover {
-	transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	transition: background-color var(--dur-short) var(--ease-out);
 }
-.card-hover:hover {
-	transform: translateY(-3px);
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+.card-hover:hover,
+.card-link:hover .card-hover,
+.card-link:focus-visible .card-hover {
+	background-color: var(--color-paper-3);
 }
 .aspect-card {
 	aspect-ratio: 2.5 / 3.5;

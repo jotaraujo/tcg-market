@@ -1,18 +1,28 @@
-import type { CardFilters } from '@/types/filters'
 import { Link } from '@tanstack/react-router'
 import { useRef } from 'react'
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import { useCards } from '@/hooks/useCards'
-import { Loader2 } from 'lucide-react'
-import CardItem from './CardItem'
-import ErrorState from '../ui/ErrorState'
-import CardSkeleton from './CardSkeleton'
 import { useExchange } from '@/hooks/useExchange'
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
+import type { CardFilters } from '@/types/filters'
+import ErrorState from '../ui/ErrorState'
+import CardItem from './CardItem'
+import CardSkeleton from './CardSkeleton'
 
 interface CardGridProps {
 	// Aqui cria um novo tipo CardFilters sem as propriedades 'num' e 'offset'
 	filters: Omit<CardFilters, 'num' | 'offset'>
 }
+
+// Colunas crescem de forma gradual: o nome da carta precisa de largura para
+// ser lido. Compartilhado entre o grid, o skeleton e a linha da próxima página.
+const GRID_CLASSES =
+	'grid grid-cols-2 gap-md sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+
+// Cartas da primeira dobra (1ª ou 2ª linha, dependendo da largura) carregam a
+// imagem na hora; o resto fica lazy.
+const PRIORITY_COUNT = 6
+
+const SKELETON_COUNT = 12
 
 const CardGrid = ({ filters }: CardGridProps) => {
 	const {
@@ -35,14 +45,20 @@ const CardGrid = ({ filters }: CardGridProps) => {
 	const sentinelRef = useIntersectionObserver({
 		onIntersect: fetchNextPage,
 		enabled: hasNextPage,
-		containerRef, // passa o container para observar relative a ele, não viewport
+		containerRef,
 	})
 
 	if (isLoading || isPending) {
+		// Sem padding próprio: a página (MarketplacePage) já aplica p-6. Manter o
+		// mesmo espaçamento do grid carregado evita deslocamento na troca.
 		return (
-			<div className='flex-1 min-h-0 overflow-y-auto p-6'>
-				<div className='grid grid-cols-2 gap-md sm:grid-cols-5 md:grid-cols-6'>
-					{Array.from({ length: 12 }).map((_, index) => (
+			<div
+				className='flex-1 min-h-0 overflow-y-auto'
+				aria-busy='true'
+				aria-label='Carregando cartas'
+			>
+				<div className={`${GRID_CLASSES} mt-2`}>
+					{Array.from({ length: SKELETON_COUNT }).map((_, index) => (
 						<CardSkeleton key={index} />
 					))}
 				</div>
@@ -66,34 +82,56 @@ const CardGrid = ({ filters }: CardGridProps) => {
 
 	if (cards.length === 0) {
 		return (
-			<p className='p-2xs text-center text-text-foreground'>
-				Nenhuma carta encontrada.
-			</p>
+			<div className='flex-1 flex flex-col items-center justify-center gap-xs p-xl text-center'>
+				<p className='text-base font-medium text-ink'>
+					Nenhuma carta encontrada.
+				</p>
+				<p className='text-sm text-text-foreground'>
+					Tente outro nome ou limpe a busca.
+				</p>
+			</div>
 		)
 	}
 
 	return (
-		<div ref={containerRef} className='flex-1 min-h-0 overflow-y-auto'>
-			<div className='grid grid-cols-2 gap-md mt-2 sm:grid-cols-5 md:grid-cols-6'>
-				{cards.map((card) => (
-					<Link
-						key={card.id}
-						to='/card/$id'
-						params={{ id: String(card.id) }}
-						className='flex flex-col gap-sm p-xs rounded-lg card-hover border border-rule bg-panel cursor-pointer'
-					>
-						<CardItem card={card} image={card.card_images[0]} rate={rate} />
-					</Link>
+		<div
+			ref={containerRef}
+			className='flex-1 min-h-0 overflow-y-auto'
+			aria-busy={isFetchingNextPage}
+		>
+			<ul className={`${GRID_CLASSES} mt-2`}>
+				{cards.map((card, index) => (
+					<li key={card.id}>
+						<Link
+							to='/card/$id'
+							params={{ id: String(card.id) }}
+							className='card-link block h-full rounded-card'
+						>
+							<CardItem
+								card={card}
+								image={card.card_images[0]}
+								rate={rate}
+								priority={index < PRIORITY_COUNT}
+							/>
+						</Link>
+					</li>
 				))}
-			</div>
+				{/* Próxima página: skeleton no lugar do spinner, o layout já é conhecido */}
+				{isFetchingNextPage &&
+					Array.from({ length: PRIORITY_COUNT }).map((_, index) => (
+						<li key={`next-${index}`} aria-hidden='true'>
+							<CardSkeleton />
+						</li>
+					))}
+			</ul>
 
-			{hasNextPage && (
-				<div ref={sentinelRef} className='flex justify-center py-xs'>
-					{isFetchingNextPage && (
-						<Loader2 className='animate-spin h-8 w-8 text-primary' />
-					)}
-				</div>
-			)}
+			{hasNextPage && <div ref={sentinelRef} className='h-xs' />}
+
+			{/* Região viva: anuncia o carregamento e o fim da lista */}
+			<p role='status' className='py-lg text-center text-sm text-ink-3'>
+				{isFetchingNextPage && 'Carregando mais cartas…'}
+				{!hasNextPage && `Fim da lista · ${cards.length} cartas`}
+			</p>
 		</div>
 	)
 }
