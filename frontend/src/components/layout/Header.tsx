@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { Search, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -29,12 +30,12 @@ const Header = () => {
 
 	return (
 		<header className='sticky top-md z-50 mx-auto mt-md flex w-[calc(100%-2rem)] max-w-256 items-center justify-between gap-sm rounded-pill border border-rule bg-paper-2/70 px-sm py-xs backdrop-blur-[14px] backdrop-saturate-[1.2] lg:gap-lg lg:px-lg'>
-			<div className='flex shrink-0 items-center gap-sm'>
+			<Link to='/' className='flex shrink-0 items-center gap-sm'>
 				<img src={logoImg} className='size-10' alt='Logo TCGMarket' />
 				<span className='whitespace-nowrap border-l border-rule px-3 font-display text-lg font-bold text-ink'>
 					TCG Market
 				</span>
-			</div>
+			</Link>
 
 			<div className='hidden lg:block'>
 				<NavLinks />
