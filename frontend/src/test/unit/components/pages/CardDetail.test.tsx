@@ -174,6 +174,47 @@ describe('CardDetail', () => {
 			expect(screen.queryByText('Nível')).not.toBeInTheDocument()
 		})
 
+		it('should show link rating and arrows instead of DEF and level for a Link monster', () => {
+			const response = makeTcgResponse(card)
+			returnData({
+				...response,
+				metadata: {
+					...response.metadata,
+					type: 'Link Monster',
+					def: undefined,
+					level: undefined,
+					linkval: 2,
+					linkmarkers: ['Top', 'Bottom'],
+				},
+			})
+			renderWithClient(<CardDetail />)
+
+			expect(screen.getByText('Link').nextElementSibling).toHaveTextContent('2')
+			expect(screen.getByText('Setas').nextElementSibling).toHaveTextContent(
+				'↑ ↓',
+			)
+			expect(screen.queryByText('DEF')).not.toBeInTheDocument()
+			expect(screen.queryByText('Nível')).not.toBeInTheDocument()
+		})
+
+		it('should show level and scale in the same stat for a Pendulum monster', () => {
+			const response = makeTcgResponse(card)
+			returnData({
+				...response,
+				metadata: {
+					...response.metadata,
+					type: 'Pendulum Effect Monster',
+					level: 7,
+					scale: 8,
+				},
+			})
+			renderWithClient(<CardDetail />)
+
+			expect(
+				screen.getByText('Nível / Escala').nextElementSibling,
+			).toHaveTextContent('7 / 8')
+		})
+
 		it('should link back to the marketplace', () => {
 			returnData(makeTcgResponse(card))
 			renderWithClient(<CardDetail />)

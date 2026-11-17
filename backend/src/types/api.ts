@@ -103,8 +103,11 @@ export interface YGOPRODECK_RawCard {
 	race: CardRace // Tipagem Forte
 	attribute?: CardAttribute // Tipagem Forte
 	level?: number
+	scale?: number
 	atk?: number
 	def?: number
+	linkval?: number
+	linkmarkers?: string[]
 	card_images: {
 		image_url: string
 	}[]
