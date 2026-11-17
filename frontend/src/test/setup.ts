@@ -8,6 +8,13 @@ Element.prototype.setPointerCapture ??= () => {}
 Element.prototype.releasePointerCapture ??= () => {}
 Element.prototype.scrollIntoView ??= () => {}
 
+// O cmdk (busca das coleções) observa o tamanho da lista com ResizeObserver.
+globalThis.ResizeObserver ??= class {
+	observe() {}
+	unobserve() {}
+	disconnect() {}
+}
+
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
