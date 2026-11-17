@@ -1,6 +1,7 @@
 import { HttpResponse, http } from 'msw'
 import { describe, expect, it } from 'vitest'
-import { fetchCards } from '@/lib/api/ygoprodeck'
+import { fetchCards, fetchSets } from '@/lib/api/ygoprodeck'
+import { SETS_URL, setsFixture } from '@/test/mocks/fixtures/sets'
 import { server } from '@/test/mocks/server'
 
 const CARDINFO_URL = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
@@ -63,5 +64,19 @@ describe('fetchCards', () => {
 		expect(search).toContain('attribute=WATER')
 		expect(search).toContain('level=4')
 		expect(search).toContain('sort=atk')
+	})
+})
+
+describe('fetchSets', () => {
+	it('should return the sets list', async () => {
+		await expect(fetchSets()).resolves.toEqual(setsFixture)
+	})
+
+	it('should throw when the API answers with an error status', async () => {
+		server.use(
+			http.get(SETS_URL, () => new HttpResponse(null, { status: 500 })),
+		)
+
+		await expect(fetchSets()).rejects.toThrow('Erro ao buscar coleções')
 	})
 })
