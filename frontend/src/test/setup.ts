@@ -7,6 +7,7 @@ Element.prototype.hasPointerCapture ??= () => false
 Element.prototype.setPointerCapture ??= () => {}
 Element.prototype.releasePointerCapture ??= () => {}
 Element.prototype.scrollIntoView ??= () => {}
+Element.prototype.scrollTo ??= () => {}
 
 // O cmdk (busca das coleções) observa o tamanho da lista com ResizeObserver.
 globalThis.ResizeObserver ??= class {

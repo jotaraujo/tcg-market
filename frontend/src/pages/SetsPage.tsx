@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import CardGrid from '@/components/cards/CardGrid'
 import SetCombobox from '@/components/sets/SetCombobox'
 import SetHeader from '@/components/sets/SetHeader'
@@ -30,6 +30,14 @@ const SetsPage = ({ selectedName, onSelectSet }: SetsPageProps) => {
 	const { data: sets, isLoading, isError, refetch, isFetching } = useSets()
 	// O ano dos chips é estado da página: continua marcado ao voltar de uma coleção
 	const [year, setYear] = useState<number | undefined>()
+
+	// O app rola dentro do <main> do layout (não na janela), então abrir ou
+	// fechar uma coleção manteria o scroll do modo anterior: quem escolhe um tile
+	// lá embaixo cairia no meio do grid. Voltar ao topo a cada troca resolve.
+	const sectionRef = useRef<HTMLElement>(null)
+	useEffect(() => {
+		sectionRef.current?.closest('main')?.scrollTo({ top: 0 })
+	}, [selectedName])
 
 	const today = new Date()
 
@@ -139,7 +147,7 @@ const SetsPage = ({ selectedName, onSelectSet }: SetsPageProps) => {
 	}
 
 	return (
-		<section className='flex flex-col gap-lg w-full p-lg'>
+		<section ref={sectionRef} className='flex flex-col gap-lg w-full p-lg'>
 			<h1 className='font-display text-2xl font-semibold tracking-tight text-ink'>
 				Coleções
 			</h1>

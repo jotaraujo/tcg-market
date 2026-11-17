@@ -192,6 +192,22 @@ describe('SetsPage', () => {
 		).not.toBeInTheDocument()
 	})
 
+	it('should scroll the page container to the top when a set is opened', async () => {
+		const user = userEvent.setup()
+		// O app rola dentro do <main> do layout, não na janela
+		const { container } = renderWithClient(
+			<main>
+				<Harness />
+			</main>,
+		)
+		const scrollTo = vi.fn()
+		container.querySelector('main')!.scrollTo = scrollTo
+
+		await user.click(await tile(/Legendary Collection/))
+
+		await waitFor(() => expect(scrollTo).toHaveBeenCalledWith({ top: 0 }))
+	})
+
 	it('should show an error with retry when the list fails', async () => {
 		server.use(
 			http.get(SETS_URL, () => new HttpResponse(null, { status: 500 })),
