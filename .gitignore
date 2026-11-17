@@ -15,6 +15,7 @@ todos.json
 # docs
 docs/*
 backend/docs/*
+STATUS.md
 
 # IAs
 .claude/*

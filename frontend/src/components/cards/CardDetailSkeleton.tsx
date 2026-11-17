@@ -1,13 +1,4 @@
 import Skeleton from '../ui/Skeleton'
-import {
-	CHART_HEIGHT,
-	DETAIL_ART_COL,
-	DETAIL_ART_FRAME,
-	DETAIL_CONTAINER,
-	DETAIL_GRID,
-	DETAIL_INFO_COL,
-	DETAIL_PANEL,
-} from './cardDetailLayout'
 
 // Espelha a página de detalhe (CardDetail): link de volta, arte, chips, nome,
 // tiles de ATK/DEF/Nível, painel de preço e painel do gráfico. As molduras vêm
@@ -23,7 +14,7 @@ const CardDetailSkeleton = () => {
 		<div
 			role='status'
 			aria-busy='true'
-			className={`${DETAIL_CONTAINER} flex flex-col gap-lg`}
+			className='mx-auto w-full max-w-288 p-lg flex flex-col gap-lg'
 		>
 			<span className='sr-only'>Carregando detalhes da carta...</span>
 
@@ -32,12 +23,12 @@ const CardDetailSkeleton = () => {
 				<Skeleton className='h-3 w-36' />
 			</div>
 
-			<div className={DETAIL_GRID}>
-				<div className={DETAIL_ART_COL}>
-					<Skeleton className={`${DETAIL_ART_FRAME} rounded-card`} />
+			<div className='grid grid-cols-1 gap-xl lg:grid-cols-12'>
+				<div className='mx-auto w-full max-w-96 lg:sticky lg:top-28 lg:col-span-5 lg:max-w-none lg:self-center'>
+					<Skeleton className='aspect-421/614 w-full overflow-hidden rounded-card border border-rule bg-panel' />
 				</div>
 
-				<div className={DETAIL_INFO_COL}>
+				<div className='flex flex-col gap-xs lg:col-span-7'>
 					<div className='flex flex-col gap-sm'>
 						{/* chips de tipo / raça / atributo */}
 						<div className='flex gap-xs'>
@@ -69,7 +60,7 @@ const CardDetailSkeleton = () => {
 					</div>
 
 					{/* painel de preço */}
-					<div className={`${DETAIL_PANEL} flex flex-col gap-md`}>
+					<div className='rounded-card border border-rule bg-panel p-lg flex flex-col gap-md'>
 						<div className='flex flex-wrap items-end justify-between gap-md'>
 							<div className='flex flex-col'>
 								<div className='flex h-lh items-center text-sm'>
@@ -94,13 +85,13 @@ const CardDetailSkeleton = () => {
 					</div>
 
 					{/* painel do gráfico */}
-					<div className={DETAIL_PANEL}>
+					<div className='rounded-card border border-rule bg-panel p-lg'>
 						<div className='mb-md flex h-lh items-center font-display text-md'>
 							<Skeleton className='h-4 w-44' />
 						</div>
 						<Skeleton
 							className='w-full rounded-input'
-							style={{ height: CHART_HEIGHT }}
+							style={{ height: 300 }}
 						/>
 					</div>
 				</div>

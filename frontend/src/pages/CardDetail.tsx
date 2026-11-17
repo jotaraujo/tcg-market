@@ -4,14 +4,6 @@ import { ArrowLeft, ChevronDown } from 'lucide-react'
 import { PriceHistorySection } from '@/components/chart/PriceHistorySection'
 import { PriceVariationBadge } from '@/components/chart/PriceVariationBadge'
 import CardDetailSkeleton from '@/components/cards/CardDetailSkeleton'
-import {
-	DETAIL_ART_COL,
-	DETAIL_ART_FRAME,
-	DETAIL_CONTAINER,
-	DETAIL_GRID,
-	DETAIL_INFO_COL,
-	DETAIL_PANEL,
-} from '@/components/cards/cardDetailLayout'
 import ErrorState from '@/components/ui/ErrorState'
 import {
 	Select,
@@ -100,7 +92,9 @@ const CardDetail = () => {
 	)
 
 	return (
-		<div className={`${DETAIL_CONTAINER} fade-in flex flex-col gap-lg`}>
+		<div
+			className={'mx-auto w-full max-w-288 p-lg fade-in flex flex-col gap-lg'}
+		>
 			<Link
 				to='/marketplace'
 				className='inline-flex w-fit items-center gap-xs text-sm text-ink-2 transition-colors duration-(--dur-short) hover:text-ink'
@@ -109,9 +103,9 @@ const CardDetail = () => {
 				Voltar ao mercado
 			</Link>
 
-			<div className={DETAIL_GRID}>
-				<div className={DETAIL_ART_COL}>
-					<div className={DETAIL_ART_FRAME}>
+			<div className='grid grid-cols-1 gap-xl lg:grid-cols-12'>
+				<div className='mx-auto w-full max-w-96 lg:sticky lg:top-28 lg:col-span-5 lg:max-w-none lg:self-center'>
+					<div className='aspect-421/614 w-full overflow-hidden rounded-card border border-rule bg-panel'>
 						<img
 							src={metadata.imageUrl}
 							alt={metadata.name}
@@ -123,7 +117,7 @@ const CardDetail = () => {
 					</div>
 				</div>
 
-				<div className={DETAIL_INFO_COL}>
+				<div className='flex flex-col gap-xs lg:col-span-7'>
 					<header className='flex flex-col gap-sm'>
 						{tags.length > 0 && (
 							<ul className='flex flex-wrap gap-xs' aria-label='Classificação'>
@@ -137,7 +131,7 @@ const CardDetail = () => {
 								))}
 							</ul>
 						)}
-						<h1 className='font-display text-2xl font-semibold text-balance text-ink [overflow-wrap:anywhere]'>
+						<h1 className='font-display text-2xl font-semibold text-balance text-ink wrap-anywhere'>
 							{metadata.name}
 						</h1>
 					</header>
@@ -161,7 +155,9 @@ const CardDetail = () => {
 					<section
 						aria-labelledby='price-label'
 						aria-busy={isPlaceholderData}
-						className={`${DETAIL_PANEL} flex flex-col gap-md`}
+						className={
+							'rounded-card border border-rule bg-panel p-lg flex flex-col gap-md'
+						}
 					>
 						<div className='flex flex-wrap items-end justify-between gap-md'>
 							<div className='flex flex-col'>
@@ -227,7 +223,10 @@ const CardDetail = () => {
 						)}
 					</section>
 
-					<section aria-labelledby='history-title' className={DETAIL_PANEL}>
+					<section
+						aria-labelledby='history-title'
+						className='rounded-card border border-rule bg-panel p-lg'
+					>
 						<div className='mb-md flex flex-wrap items-baseline justify-between gap-xs'>
 							<h2
 								id='history-title'
