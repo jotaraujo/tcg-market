@@ -1,10 +1,21 @@
-import { ChevronDown, SlidersHorizontal } from 'lucide-react'
-import { useId, useState } from 'react'
+import { ArrowUpDown, ChevronDown, type LucideIcon, X } from 'lucide-react'
 import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectSeparator,
+	SelectTrigger,
+} from '@/components/ui/select'
+import {
+	clearFilters,
 	countActiveFilters,
+	isSpellOrTrap,
 	raceOptionsFor,
 	setFilter,
 } from '@/lib/filterRules'
+import { cn } from '@/lib/utils'
 import { CARD_TYPES } from '@/types/card'
 import {
 	ATTRIBUTE_OPTIONS,
@@ -18,195 +29,238 @@ interface FilterBarProps {
 	onChange: (filters: SelectableFilters) => void
 }
 
-interface FilterSelectProps {
+interface FilterPillProps {
+	// Nome acessível do select ("Tipo", "Ordenar por")
 	label: string
+	// Texto curto mostrado na pílula; padrão: o próprio label
+	text?: string
 	value: string
+	// Texto do valor escolhido na pílula; padrão: o próprio value
+	valueLabel?: string
 	onChange: (value: string) => void
-	// Texto da opção vazia ("Todos", "Padrão")
+	// Remove só este filtro. Sem ele (ordenação) a pílula não ganha o "×".
+	onClear?: () => void
+	// Texto da opção "sem filtro" dentro da lista ("Todos os tipos", "Padrão")
 	emptyLabel: string
-	disabled?: boolean
-	disabledReason?: string
+	// Ícone mostrado quando não há valor ativo (padrão: seta de seleção)
+	icon?: LucideIcon
+	className?: string
+	// <SelectItem>/<SelectGroup> com as opções reais
 	children: React.ReactNode
 }
 
-// <select> nativo de propósito: acessível por teclado sem código extra e, no
-// celular, abre o seletor do sistema (melhor que um popover para 28 tipos).
-const FilterSelect = ({
+// O Radix Select não aceita value="" num item, então "sem filtro" usa um
+// valor reservado que só existe aqui dentro: para fora, continua sendo ''.
+const ALL = '__all__'
+
+// A pílula é só a pele: o Select do Radix cuida do teclado, do foco e da
+// acessibilidade, e o texto visível é livre (ex.: "Tipo: Effect Monster").
+const FilterPill = ({
 	label,
+	text = label,
 	value,
+	valueLabel = value,
 	onChange,
+	onClear,
 	emptyLabel,
-	disabled = false,
-	disabledReason,
+	icon: Icon = ChevronDown,
+	className,
 	children,
-}: FilterSelectProps) => {
-	const id = useId()
-	const isActive = value !== ''
+}: FilterPillProps) => {
+	const hasValue = value !== ''
+	// Só filtros ficam "acesos"; a ordenação não restringe os resultados.
+	const isActive = hasValue && onClear !== undefined
 
 	return (
-		<div className='flex min-w-0 flex-col gap-2xs'>
-			<label htmlFor={id} className='text-sm text-ink-2'>
-				{label}
-			</label>
-			<div className='relative'>
-				<select
-					id={id}
-					value={value}
-					disabled={disabled}
-					title={disabled ? disabledReason : undefined}
-					onChange={(event) => onChange(event.target.value)}
-					className={`h-11 w-full appearance-none rounded-input border bg-paper-2 pl-sm pr-xl text-sm text-ink [color-scheme:dark] transition-colors duration-(--dur-short) hover:bg-paper-3 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-paper-2 ${
-						isActive ? 'border-primary' : 'border-rule'
-					}`}
+		<Select
+			value={hasValue ? value : ALL}
+			onValueChange={(next) => onChange(next === ALL ? '' : next)}
+		>
+			<div
+				className={cn(
+					'inline-flex h-11 shrink-0 items-center rounded-pill border text-sm text-ink transition-[background-color,border-color] duration-(--dur-short) hover:bg-paper-3 has-[[role=combobox]:focus-visible]:outline-2 has-[[role=combobox]:focus-visible]:outline-offset-2 has-[[role=combobox]:focus-visible]:outline-focus has-[[role=combobox][data-state=open]]:bg-paper-3 md:h-10',
+					isActive
+						? 'border-primary bg-primary/15 pr-2xs'
+						: 'border-rule bg-paper-2',
+					className,
+				)}
+			>
+				<SelectTrigger
+					aria-label={label}
+					className={cn(
+						'flex h-full min-w-0 cursor-pointer items-center gap-xs rounded-pill pl-sm outline-hidden',
+						isActive ? 'pr-xs' : 'pr-sm',
+					)}
 				>
-					<option value=''>{emptyLabel}</option>
-					{children}
-				</select>
-				<ChevronDown
-					aria-hidden='true'
-					className='pointer-events-none absolute right-sm top-1/2 size-4 -translate-y-1/2 text-ink-2'
-				/>
+					<span className='max-w-48 truncate'>
+						{hasValue ? (
+							<>
+								<span className='text-ink-2'>{text}:</span>{' '}
+								<span className={isActive ? 'font-medium' : undefined}>
+									{valueLabel}
+								</span>
+							</>
+						) : (
+							text
+						)}
+					</span>
+					{!isActive && (
+						<Icon aria-hidden='true' className='size-4 shrink-0 text-ink-2' />
+					)}
+				</SelectTrigger>
+
+				{isActive && (
+					<button
+						type='button'
+						aria-label={`Remover filtro ${label}`}
+						onClick={onClear}
+						className='grid size-8 shrink-0 place-items-center rounded-pill text-ink-2 transition-colors duration-(--dur-short) hover:bg-paper-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-focus'
+					>
+						<X aria-hidden='true' className='size-4' />
+					</button>
+				)}
 			</div>
-		</div>
+
+			<SelectContent aria-label={label}>
+				<SelectItem value={ALL}>{emptyLabel}</SelectItem>
+				{children}
+			</SelectContent>
+		</Select>
 	)
 }
 
 const FilterBar = ({ filters, onChange }: FilterBarProps) => {
-	const panelId = useId()
-	const [isOpen, setIsOpen] = useState(false)
-
-	const activeCount = countActiveFilters(filters)
-	const hasAnyFilter = activeCount > 0 || filters.sort !== undefined
-	const isSpellOrTrap =
-		filters.type === 'Spell Card' || filters.type === 'Trap Card'
+	const hasActiveFilter = countActiveFilters(filters) > 0
+	// Spell e Trap não têm atributo nem nível: em vez de desabilitar sem
+	// explicação, as pílulas somem (a API devolveria "nenhuma carta" de qualquer jeito).
+	const hasMonsterFields = !isSpellOrTrap(filters.type)
 
 	const change = (key: keyof SelectableFilters) => (value: string) =>
 		onChange(setFilter(filters, key, value))
+	const remove = (key: keyof SelectableFilters) => () =>
+		onChange(setFilter(filters, key, ''))
 
 	return (
-		<div className='flex flex-col gap-sm'>
-			{/* Mobile: os filtros ficam recolhidos atrás de um botão */}
-			<button
-				type='button'
-				aria-expanded={isOpen}
-				aria-controls={panelId}
-				aria-label={
-					activeCount > 0 ? `Filtros, ${activeCount} ativos` : 'Filtros'
-				}
-				onClick={() => setIsOpen((open) => !open)}
-				className='flex h-11 w-fit items-center gap-xs rounded-input border border-rule bg-paper-2 px-sm text-sm text-ink transition-colors duration-(--dur-short) hover:bg-paper-3 md:hidden'
+		// Uma linha só. No celular ela rola na horizontal (o padding dá espaço
+		// para o anel de foco não ser cortado pelo overflow).
+		<div
+			role='group'
+			aria-label='Filtros e ordenação'
+			className='scrollbar-hide -mx-1 -my-1 flex items-center gap-xs overflow-x-auto p-1 md:flex-wrap md:overflow-visible'
+		>
+			<FilterPill
+				label='Tipo'
+				value={filters.type ?? ''}
+				onChange={change('type')}
+				onClear={remove('type')}
+				emptyLabel='Todos os tipos'
 			>
-				<SlidersHorizontal aria-hidden='true' className='size-4' />
-				Filtros
-				{activeCount > 0 && (
-					<span
-						aria-hidden='true'
-						className='grid size-5 place-items-center rounded-pill bg-primary text-sm text-primary-foreground'
-					>
-						{activeCount}
-					</span>
-				)}
-			</button>
+				<SelectSeparator />
+				<SelectGroup>
+					<SelectLabel>Main Deck</SelectLabel>
+					{CARD_TYPES.mainDeck.map((type) => (
+						<SelectItem key={type} value={type}>
+							{type}
+						</SelectItem>
+					))}
+				</SelectGroup>
+				<SelectSeparator />
+				<SelectGroup>
+					<SelectLabel>Extra Deck</SelectLabel>
+					{CARD_TYPES.extraDeck.map((type) => (
+						<SelectItem key={type} value={type}>
+							{type}
+						</SelectItem>
+					))}
+				</SelectGroup>
+				<SelectSeparator />
+				<SelectGroup>
+					<SelectLabel>Outros</SelectLabel>
+					{CARD_TYPES.otherTypes.map((type) => (
+						<SelectItem key={type} value={type}>
+							{type}
+						</SelectItem>
+					))}
+				</SelectGroup>
+			</FilterPill>
 
-			<div
-				id={panelId}
-				className={`${isOpen ? 'grid' : 'hidden'} grid-cols-2 gap-sm md:grid md:grid-cols-[repeat(5,minmax(0,1fr))_auto] md:items-end`}
-			>
-				<FilterSelect
-					label='Tipo'
-					value={filters.type ?? ''}
-					onChange={change('type')}
-					emptyLabel='Todos'
-				>
-					<optgroup label='Main Deck'>
-						{CARD_TYPES.mainDeck.map((type) => (
-							<option key={type} value={type}>
-								{type}
-							</option>
-						))}
-					</optgroup>
-					<optgroup label='Extra Deck'>
-						{CARD_TYPES.extraDeck.map((type) => (
-							<option key={type} value={type}>
-								{type}
-							</option>
-						))}
-					</optgroup>
-					<optgroup label='Outros'>
-						{CARD_TYPES.otherTypes.map((type) => (
-							<option key={type} value={type}>
-								{type}
-							</option>
-						))}
-					</optgroup>
-				</FilterSelect>
-
-				<FilterSelect
+			{hasMonsterFields && (
+				<FilterPill
 					label='Atributo'
 					value={filters.attribute ?? ''}
 					onChange={change('attribute')}
-					emptyLabel='Todos'
-					disabled={isSpellOrTrap}
-					disabledReason='Spell e Trap não têm atributo'
+					onClear={remove('attribute')}
+					emptyLabel='Todos os atributos'
 				>
 					{ATTRIBUTE_OPTIONS.map((attribute) => (
-						<option key={attribute} value={attribute}>
+						<SelectItem key={attribute} value={attribute}>
 							{attribute}
-						</option>
+						</SelectItem>
 					))}
-				</FilterSelect>
+				</FilterPill>
+			)}
 
-				<FilterSelect
-					label='Raça'
-					value={filters.race ?? ''}
-					onChange={change('race')}
-					emptyLabel='Todas'
-				>
-					{raceOptionsFor(filters.type).map((race) => (
-						<option key={race} value={race}>
-							{race}
-						</option>
-					))}
-				</FilterSelect>
+			<FilterPill
+				label='Raça'
+				value={filters.race ?? ''}
+				onChange={change('race')}
+				onClear={remove('race')}
+				emptyLabel='Todas as raças'
+			>
+				{raceOptionsFor(filters.type).map((race) => (
+					<SelectItem key={race} value={race}>
+						{race}
+					</SelectItem>
+				))}
+			</FilterPill>
 
-				<FilterSelect
+			{hasMonsterFields && (
+				<FilterPill
 					label='Nível'
 					value={filters.level === undefined ? '' : String(filters.level)}
 					onChange={change('level')}
-					emptyLabel='Todos'
-					disabled={isSpellOrTrap}
-					disabledReason='Spell e Trap não têm nível'
+					onClear={remove('level')}
+					emptyLabel='Todos os níveis'
 				>
 					{LEVEL_OPTIONS.map((level) => (
-						<option key={level} value={level}>
+						<SelectItem key={level} value={String(level)}>
 							{level}
-						</option>
+						</SelectItem>
 					))}
-				</FilterSelect>
+				</FilterPill>
+			)}
 
-				<FilterSelect
-					label='Ordenar por'
-					value={filters.sort ?? ''}
-					onChange={change('sort')}
-					emptyLabel='Padrão'
+			{/* Fica logo depois das pílulas: ao aparecer, nada muda de lugar */}
+			{hasActiveFilter && (
+				<button
+					type='button'
+					onClick={() => onChange(clearFilters(filters))}
+					className='inline-flex h-11 shrink-0 items-center gap-2xs whitespace-nowrap rounded-pill px-sm text-sm text-ink-2 transition-colors duration-(--dur-short) hover:bg-paper-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-focus md:h-10'
 				>
-					{SORT_OPTIONS.map(({ value, label }) => (
-						<option key={value} value={value}>
-							{label}
-						</option>
-					))}
-				</FilterSelect>
+					<X aria-hidden='true' className='size-4' />
+					Limpar filtros
+				</button>
+			)}
 
-				{hasAnyFilter && (
-					<button
-						type='button'
-						onClick={() => onChange({})}
-						className='col-span-2 h-11 whitespace-nowrap rounded-input px-sm text-sm text-ink-2 transition-colors duration-(--dur-short) hover:text-ink md:col-span-1'
-					>
-						Limpar filtros
-					</button>
-				)}
-			</div>
+			{/* Ordenar é outro conceito: fica separado, à direita, sem destaque */}
+			<FilterPill
+				label='Ordenar por'
+				text='Ordenar'
+				value={filters.sort ?? ''}
+				valueLabel={
+					SORT_OPTIONS.find(({ value }) => value === filters.sort)?.label
+				}
+				onChange={change('sort')}
+				emptyLabel='Padrão'
+				icon={ArrowUpDown}
+				className='md:ml-auto'
+			>
+				{SORT_OPTIONS.map(({ value, label }) => (
+					<SelectItem key={value} value={value}>
+						{label}
+					</SelectItem>
+				))}
+			</FilterPill>
 		</div>
 	)
 }

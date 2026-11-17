@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+	clearFilters,
 	countActiveFilters,
 	raceOptionsFor,
 	setFilter,
@@ -120,5 +121,17 @@ describe('countActiveFilters', () => {
 
 	it('should not count the sort order as a filter', () => {
 		expect(countActiveFilters({ sort: 'atk' })).toBe(0)
+	})
+})
+
+describe('clearFilters', () => {
+	it('should drop every filter but keep the sort order', () => {
+		expect(
+			clearFilters({ type: 'Effect Monster', level: 4, sort: 'atk' }),
+		).toEqual({ sort: 'atk' })
+	})
+
+	it('should return an empty object when there is no sort order', () => {
+		expect(clearFilters({ attribute: 'WATER' })).toEqual({})
 	})
 })

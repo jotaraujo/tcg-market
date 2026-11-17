@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import MarketplacePage from '@/pages/MarketplacePage'
 import { useSearchTermStore } from '@/stores/useSearchTermStore'
 import { server } from '@/test/mocks/server'
-import { renderWithClient } from '@/test/utils'
+import { chooseOption, renderWithClient } from '@/test/utils'
 
 // O jsdom não tem IntersectionObserver e a paginação não é o foco aqui.
 vi.mock('@/hooks/useIntersectionObserver', () => ({
@@ -37,8 +37,19 @@ const recordRequests = () => {
 const lastSearch = (searches: URLSearchParams[]) => searches.at(-1)
 
 describe('MarketplacePage', () => {
+	let user: ReturnType<typeof userEvent.setup>
+
 	beforeEach(() => {
+		user = userEvent.setup()
 		useSearchTermStore.setState({ term: '' })
+	})
+
+	it('should show the page title above the filters', () => {
+		renderWithClient(<MarketplacePage />)
+
+		expect(
+			screen.getByRole('heading', { level: 1, name: 'Mercado' }),
+		).toBeInTheDocument()
 	})
 
 	it('should render the filter bar above the grid', async () => {
@@ -53,10 +64,7 @@ describe('MarketplacePage', () => {
 		renderWithClient(<MarketplacePage />)
 		await waitFor(() => expect(searches.length).toBeGreaterThan(0))
 
-		await userEvent.selectOptions(
-			screen.getByRole('combobox', { name: 'Atributo' }),
-			'WATER',
-		)
+		await chooseOption(user, 'Atributo', 'WATER')
 
 		await waitFor(() =>
 			expect(lastSearch(searches)?.get('attribute')).toBe('WATER'),
@@ -70,10 +78,7 @@ describe('MarketplacePage', () => {
 		const searches = recordRequests()
 		renderWithClient(<MarketplacePage />)
 
-		await userEvent.selectOptions(
-			screen.getByRole('combobox', { name: 'Nível' }),
-			'4',
-		)
+		await chooseOption(user, 'Nível', '4')
 
 		await waitFor(() => {
 			const search = lastSearch(searches)
@@ -97,10 +102,7 @@ describe('MarketplacePage', () => {
 		)
 		renderWithClient(<MarketplacePage />)
 
-		await userEvent.selectOptions(
-			screen.getByRole('combobox', { name: 'Atributo' }),
-			'WATER',
-		)
+		await chooseOption(user, 'Atributo', 'WATER')
 
 		expect(
 			await screen.findByText('Nenhuma carta encontrada.'),
@@ -113,17 +115,14 @@ describe('MarketplacePage', () => {
 		renderWithClient(<MarketplacePage />)
 		await waitFor(() => expect(searches.length).toBe(1))
 
-		await userEvent.selectOptions(
-			screen.getByRole('combobox', { name: 'Atributo' }),
-			'WATER',
-		)
+		await chooseOption(user, 'Atributo', 'WATER')
 		await waitFor(() => expect(searches.length).toBe(2))
 
-		await userEvent.click(
-			screen.getByRole('button', { name: 'Limpar filtros' }),
-		)
+		await user.click(screen.getByRole('button', { name: 'Limpar filtros' }))
 
-		expect(screen.getByRole('combobox', { name: 'Atributo' })).toHaveValue('')
+		expect(
+			screen.getByRole('combobox', { name: 'Atributo' }),
+		).toHaveTextContent(/^Atributo$/)
 		// A consulta sem filtros já está no cache (staleTime de 1 dia): voltar a
 		// ela não faz uma nova requisição.
 		await new Promise((resolve) => setTimeout(resolve, 100))
