@@ -3,9 +3,9 @@ import CardGrid from '@/components/cards/CardGrid'
 import SetCombobox from '@/components/sets/SetCombobox'
 import SetHeader from '@/components/sets/SetHeader'
 import SetTile from '@/components/sets/SetTile'
+import SetTileSkeleton from '@/components/sets/SetTileSkeleton'
 import YearSelect from '@/components/sets/YearSelect'
 import ErrorState from '@/components/ui/ErrorState'
-import Skeleton from '@/components/ui/Skeleton'
 import { useSets } from '@/hooks/useSets'
 import {
 	findSetByName,
@@ -50,7 +50,7 @@ const SetsPage = ({ selectedName, onSelectSet }: SetsPageProps) => {
 					aria-label='Carregando coleções'
 				>
 					{Array.from({ length: SKELETON_COUNT }).map((_, index) => (
-						<Skeleton key={index} className='aspect-square w-full' />
+						<SetTileSkeleton key={index} />
 					))}
 				</div>
 			)

@@ -43,4 +43,30 @@ describe('SetTile', () => {
 		expect(screen.getByText(/100 cartas/)).toBeInTheDocument()
 		expect(screen.getByText(/2025/)).toBeInTheDocument()
 	})
+	it('should keep every art in the same fixed-ratio frame, whatever its proportions', () => {
+		const { container } = render(<SetTile set={withImage} onSelect={vi.fn()} />)
+
+		const img = container.querySelector('img')!
+		expect(img).toHaveClass('object-contain')
+		expect(img.parentElement).toHaveClass('aspect-4/3')
+		// Fora do fluxo: uma arte alta não pode esticar a moldura além dos 4:3
+		expect(img).toHaveClass('absolute')
+	})
+
+	it('should show the full name on hover when the layout truncates it', () => {
+		render(<SetTile set={withImage} onSelect={vi.fn()} />)
+
+		expect(screen.getByTitle('Fresh Booster')).toBeInTheDocument()
+	})
+
+	it('should use the singular for a set with one card', () => {
+		render(
+			<SetTile
+				set={{ ...withImage, set_name: 'Solo', num_of_cards: 1 }}
+				onSelect={vi.fn()}
+			/>,
+		)
+
+		expect(screen.getByText(/1 carta$/)).toBeInTheDocument()
+	})
 })
