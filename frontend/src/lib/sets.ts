@@ -1,8 +1,6 @@
 import type { CardSet } from '@/types/card'
 import type { YgoSet } from '@/types/set'
 
-const RECENT_LIMIT = 12
-
 // AAAA-MM-DD em UTC: a data da API não tem horário, então comparar como texto
 // evita erro de fuso.
 const toIsoDay = (date: Date) => date.toISOString().slice(0, 10)
@@ -20,7 +18,8 @@ const byNewest = (a: YgoSet, b: YgoSet) => {
 export const isUnreleased = (set: YgoSet, today: Date): boolean =>
 	set.tcg_date !== undefined && set.tcg_date > toIsoDay(today)
 
-const getReleasedDated = (sets: YgoSet[], today: Date): YgoSet[] =>
+// Lançadas e com data, da mais nova para a mais antiga (base dos tiles e dos anos)
+export const getReleasedSets = (sets: YgoSet[], today: Date): YgoSet[] =>
 	sets
 		.filter((set) => set.tcg_date !== undefined && !isUnreleased(set, today))
 		.sort(byNewest)
@@ -28,16 +27,10 @@ const getReleasedDated = (sets: YgoSet[], today: Date): YgoSet[] =>
 export const getSearchableSets = (sets: YgoSet[], today: Date): YgoSet[] =>
 	sets.filter((set) => !isUnreleased(set, today)).sort(byNewest)
 
-export const getRecentSets = (
-	sets: YgoSet[],
-	today: Date,
-	limit = RECENT_LIMIT,
-): YgoSet[] => getReleasedDated(sets, today).slice(0, limit)
-
 const yearOf = (set: YgoSet) => Number(set.tcg_date?.slice(0, 4))
 
 export const getSetYears = (sets: YgoSet[], today: Date): number[] => [
-	...new Set(getReleasedDated(sets, today).map(yearOf)),
+	...new Set(getReleasedSets(sets, today).map(yearOf)),
 ]
 
 export const getSetsByYear = (
@@ -45,7 +38,7 @@ export const getSetsByYear = (
 	year: number,
 	today: Date,
 ): YgoSet[] =>
-	getReleasedDated(sets, today).filter((set) => yearOf(set) === year)
+	getReleasedSets(sets, today).filter((set) => yearOf(set) === year)
 
 // Nome exato: os nomes são únicos na API, os códigos não (ex.: YS15 ×3)
 export const findSetByName = (

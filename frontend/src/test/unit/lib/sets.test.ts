@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
 	findSetByName,
-	getRecentSets,
+	getReleasedSets,
 	getSearchableSets,
 	getSetPrinting,
 	getSetsByYear,
@@ -58,24 +58,21 @@ describe('getSearchableSets', () => {
 	})
 })
 
-describe('getRecentSets', () => {
-	it('should return the newest released sets up to the limit', () => {
-		expect(names(getRecentSets(SETS, TODAY, 2))).toEqual(['NEW', 'NEW2'])
+describe('getReleasedSets', () => {
+	it('should return every released dated set, newest first', () => {
+		expect(names(getReleasedSets(SETS, TODAY))).toEqual([
+			'NEW',
+			'NEW2',
+			'MID',
+			'OLD',
+		])
 	})
 
 	it('should never include undated or unreleased sets', () => {
-		const recent = names(getRecentSets(SETS, TODAY))
+		const released = names(getReleasedSets(SETS, TODAY))
 
-		expect(recent).not.toContain('NODATE')
-		expect(recent).not.toContain('FUTURE')
-	})
-
-	it('should default to 12 sets', () => {
-		const many = Array.from({ length: 20 }, (_, i) =>
-			makeSet(`S${i}`, `2020-01-${String(i + 1).padStart(2, '0')}`),
-		)
-
-		expect(getRecentSets(many, TODAY)).toHaveLength(12)
+		expect(released).not.toContain('NODATE')
+		expect(released).not.toContain('FUTURE')
 	})
 })
 

@@ -35,7 +35,7 @@ describe('SetsPage', () => {
 		renderWithClient(<Harness />)
 
 		const list = await screen.findByRole('list', {
-			name: 'Lançamentos recentes',
+			name: 'Todas as coleções',
 		})
 		const tiles = within(list).getAllByRole('button')
 
@@ -50,11 +50,31 @@ describe('SetsPage', () => {
 		expect(screen.queryByText(/Undated Promo/)).not.toBeInTheDocument()
 	})
 
+	it('should not cap the list at 12: "all years" starts with a batch of 24', async () => {
+		server.use(
+			http.get(SETS_URL, () =>
+				HttpResponse.json(
+					Array.from({ length: 40 }, (_, index) => ({
+						set_name: `Coleção ${index + 1}`,
+						set_code: `C${index + 1}`,
+						num_of_cards: 10,
+						tcg_date: '2020-01-01',
+					})),
+				),
+			),
+		)
+		renderWithClient(<Harness />)
+
+		const list = await screen.findByRole('list', { name: 'Todas as coleções' })
+
+		expect(within(list).getAllByRole('button')).toHaveLength(24)
+	})
+
 	it('should filter the tiles by the chosen year', async () => {
 		const user = userEvent.setup()
 		renderWithClient(<Harness />)
 
-		await screen.findByRole('list', { name: 'Lançamentos recentes' })
+		await screen.findByRole('list', { name: 'Todas as coleções' })
 		await chooseOption(user, 'Ano de lançamento', '2020')
 
 		expect(
@@ -77,7 +97,7 @@ describe('SetsPage', () => {
 		).toBeInTheDocument()
 		expect(await screen.findByText('Carta de Teste 1')).toBeInTheDocument()
 		expect(
-			screen.queryByRole('list', { name: 'Lançamentos recentes' }),
+			screen.queryByRole('list', { name: 'Todas as coleções' }),
 		).not.toBeInTheDocument()
 		expect(
 			screen.queryByRole('combobox', { name: 'Ano de lançamento' }),
@@ -159,7 +179,7 @@ describe('SetsPage', () => {
 		const user = userEvent.setup()
 		renderWithClient(<Harness />)
 
-		await screen.findByRole('list', { name: 'Lançamentos recentes' })
+		await screen.findByRole('list', { name: 'Todas as coleções' })
 		await chooseOption(user, 'Ano de lançamento', '2020')
 		await user.click(await tile(/Duelist Pack: Test/))
 		await user.click(

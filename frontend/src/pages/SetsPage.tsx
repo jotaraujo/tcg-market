@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import CardGrid from '@/components/cards/CardGrid'
 import SetCombobox from '@/components/sets/SetCombobox'
 import SetHeader from '@/components/sets/SetHeader'
-import SetTile from '@/components/sets/SetTile'
+import SetTileGrid, { SET_GRID_CLASSES } from '@/components/sets/SetTileGrid'
 import SetTileSkeleton from '@/components/sets/SetTileSkeleton'
 import YearSelect from '@/components/sets/YearSelect'
 import ErrorState from '@/components/ui/ErrorState'
 import { useSets } from '@/hooks/useSets'
 import {
 	findSetByName,
-	getRecentSets,
+	getReleasedSets,
 	getSearchableSets,
 	getSetsByYear,
 	getSetYears,
@@ -20,9 +20,6 @@ interface SetsPageProps {
 	selectedName?: string
 	onSelectSet: (name?: string) => void
 }
-
-const TILES_GRID_CLASSES =
-	'grid grid-cols-2 gap-md sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
 
 const SKELETON_COUNT = 12
 
@@ -45,7 +42,7 @@ const SetsPage = ({ selectedName, onSelectSet }: SetsPageProps) => {
 		if (isLoading) {
 			return (
 				<div
-					className={TILES_GRID_CLASSES}
+					className={SET_GRID_CLASSES}
 					aria-busy='true'
 					aria-label='Carregando coleções'
 				>
@@ -121,10 +118,10 @@ const SetsPage = ({ selectedName, onSelectSet }: SetsPageProps) => {
 
 		const tiles =
 			year === undefined
-				? getRecentSets(sets, today)
+				? getReleasedSets(sets, today)
 				: getSetsByYear(sets, year, today)
 		const title =
-			year === undefined ? 'Lançamentos recentes' : `Coleções de ${year}`
+			year === undefined ? 'Todas as coleções' : `Coleções de ${year}`
 
 		return (
 			<>
@@ -136,14 +133,13 @@ const SetsPage = ({ selectedName, onSelectSet }: SetsPageProps) => {
 						onChange={setYear}
 					/>
 				</div>
-				<h2 className='font-display text-xl font-semibold text-ink'>{title}</h2>
-				<ul aria-label={title} className={TILES_GRID_CLASSES}>
-					{tiles.map((set) => (
-						<li key={set.set_name}>
-							<SetTile set={set} onSelect={onSelectSet} />
-						</li>
-					))}
-				</ul>
+				{/* key: trocar o ano remonta a grade e volta ao primeiro lote */}
+				<SetTileGrid
+					key={year ?? 'all'}
+					title={title}
+					sets={tiles}
+					onSelect={onSelectSet}
+				/>
 			</>
 		)
 	}
