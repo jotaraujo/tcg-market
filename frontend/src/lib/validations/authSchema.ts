@@ -11,7 +11,7 @@ export const signUpSchema = z
 		email: emailSchema,
 		password: z
 			.string()
-			.min(8, { error: 'A senha deve ter pelo menos caracteres.' }),
+			.min(8, { error: 'A senha deve ter pelo menos 8 caracteres.' }),
 		confirmPassword: z.string().min(1, { error: 'Confirme a senha.' }),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
@@ -20,8 +20,8 @@ export const signUpSchema = z
 	})
 
 export const loginSchema = z.object({
-  email: emailSchema,
-  password: z.string().min(1, { error: 'Informe a senha.' }),
+	email: emailSchema,
+	password: z.string().min(1, { error: 'Informe a senha.' }),
 })
 
 export type SignUpInput = z.infer<typeof signUpSchema>

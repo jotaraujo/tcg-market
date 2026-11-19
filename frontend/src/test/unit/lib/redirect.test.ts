@@ -1,12 +1,13 @@
 import { safeRedirectPath } from '@/lib/redirect'
 
 describe('safeRedirectPath', () => {
-	it.each(['/favorites', '/card/123?setCode=LOB-EN001', '/authors'])(
-		'should accept the internal path %s',
-		(path) => {
-			expect(safeRedirectPath(path)).toBe(path)
-		},
-	)
+	it.each([
+		'/favorites',
+		'/card/123?setCode=LOB-EN001',
+		'/authors',
+	])('should accept the internal path %s', (path) => {
+		expect(safeRedirectPath(path)).toBe(path)
+	})
 
 	it.each([
 		'//evil.com',
@@ -21,12 +22,14 @@ describe('safeRedirectPath', () => {
 		expect(safeRedirectPath(input)).toBe('/marketplace')
 	})
 
-	it.each(['/login', '/login?redirect=%2Flogin', '/signup', '/auth/callback'])(
-		'should not return %s (avoids redirect loops)',
-		(path) => {
-			expect(safeRedirectPath(path)).toBe('/marketplace')
-		},
-	)
+	it.each([
+		'/login',
+		'/login?redirect=%2Flogin',
+		'/signup',
+		'/auth/callback',
+	])('should not return %s (avoids redirect loops)', (path) => {
+		expect(safeRedirectPath(path)).toBe('/marketplace')
+	})
 
 	it('should use the custom fallback when given', () => {
 		expect(safeRedirectPath('//evil.com', '/favorites')).toBe('/favorites')

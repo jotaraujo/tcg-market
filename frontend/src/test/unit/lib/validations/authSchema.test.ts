@@ -1,28 +1,28 @@
-import { loginSchema, signUpSchema } from "#/lib/validations/authSchema"
+import { loginSchema, signUpSchema } from '@/lib/validations/authSchema'
 
 describe('loginSchema', () => {
-  it('should trim and lowercase the email', () => {
-    const result = loginSchema.parse({
-      email: ' Ana@Mail.COM  ',
-      password: 'x'
-    })
-    expect(result.email).toBe('ana@mail.com')
-  })
+	it('should trim and lowercase the email', () => {
+		const result = loginSchema.parse({
+			email: ' Ana@Mail.COM  ',
+			password: 'x',
+		})
+		expect(result.email).toBe('ana@mail.com')
+	})
 
-  it('should accept a short password, with no minimum length', () => {
-    const result = loginSchema.safeParse({ email: 'a@b.co', password: 'X' })
-    expect(result.success).toBe(true)
-  })
+	it('should accept a short password, with no minimum length', () => {
+		const result = loginSchema.safeParse({ email: 'a@b.co', password: 'X' })
+		expect(result.success).toBe(true)
+	})
 
-  it('should reject an empty password', () => {
-    const result = loginSchema.safeParse({ email: 'a@b.co', password: '' })
-    expect(result.success).toBe(false)
-  })
+	it('should reject an empty password', () => {
+		const result = loginSchema.safeParse({ email: 'a@b.co', password: '' })
+		expect(result.success).toBe(false)
+	})
 
-    it('should reject an invalid email', () => {
-    const result = loginSchema.safeParse({ email: 'a@', password: 'x' })
-    expect(result.success).toBe(false)
-  })
+	it('should reject an invalid email', () => {
+		const result = loginSchema.safeParse({ email: 'a@', password: 'x' })
+		expect(result.success).toBe(false)
+	})
 })
 
 describe('signUpSchema', () => {
