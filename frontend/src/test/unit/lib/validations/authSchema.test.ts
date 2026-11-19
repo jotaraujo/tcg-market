@@ -49,6 +49,21 @@ describe('signUpSchema', () => {
 		).toBe(false)
 	})
 
+	it('should reject a 7-character password with a message about the minimum', () => {
+		const result = signUpSchema.safeParse({
+			email: 'a@b.co',
+			password: '1234567',
+			confirmPassword: '1234567',
+		})
+		expect(result.success).toBe(false)
+
+		const passwordIssue = result.error?.issues.find(
+			(issue) => issue.path[0] === 'password',
+		)
+		expect(passwordIssue).toBeDefined()
+		expect(passwordIssue?.message).toContain('8')
+	})
+
 	it('should point the mismatch error at confirmPassword', () => {
 		const result = signUpSchema.safeParse({
 			email: 'a@b.co',
