@@ -1,5 +1,4 @@
 import { User } from 'lucide-react'
-import { useAuthStore } from '#/stores/useAuthStore'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { Button } from '../ui/button'
 import {
@@ -9,11 +8,13 @@ import {
 } from '../ui/dropdown-menu'
 import AccountMenuItems from './AccountMenuItems'
 import { MENU_CONTENT_CLASS, MENU_SIDE_OFFSET } from './menuStyles'
+import { useAuth } from '@/hooks/useAuth'
 
 const UserMenu = () => {
-	const { isAuthenticated, user } = useAuthStore()
+	const { isAuthenticated, user } = useAuth()
 
-	const initials = user?.slice(0, 2).toUpperCase() ?? '??'
+	const label = user?.name ?? user?.email
+	const initials = label?.slice(0, 2).toUpperCase() ?? '??'
 
 	return (
 		<DropdownMenu>
