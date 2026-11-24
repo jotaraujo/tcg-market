@@ -6,8 +6,6 @@ export function safeRedirectPath(
 ): string {
 	if (typeof input !== 'string') return fallback
 
-	// Barra invertida e espaços/tab/quebra de linha: navegadores os tratam
-	// como "/" ou os removem, o que reabre o caminho para "//evil.com".
 	if (/[\s\\]/.test(input)) return fallback
 
 	if (!input.startsWith('/') || input.startsWith('//')) return fallback

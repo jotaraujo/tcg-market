@@ -1,15 +1,16 @@
 import { create } from 'zustand'
+import type { AuthStatus, AuthUser } from '@/types/auth'
 
 interface AuthState {
-	isAuthenticated: boolean
-	user: string | null
-	login: (user: string) => void
-	logout: () => void
+	status: AuthStatus
+	user: AuthUser | null
+	setAuthenticated: (user: AuthUser) => void
+	setUnauthenticated: () => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-	isAuthenticated: false,
+	status: 'loading',
 	user: null,
-	login: (user: string) => set({ isAuthenticated: true, user }),
-	logout: () => set({ isAuthenticated: false, user: null }),
+	setAuthenticated: (user) => set({ status: 'authenticated', user }),
+	setUnauthenticated: () => set({ status: 'unauthenticated', user: null })
 }))

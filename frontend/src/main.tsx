@@ -1,7 +1,9 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
+import { initAuth } from './lib/auth'
+import { queryClient } from './lib/queryClient'
 import { getRouter } from './router'
 import './styles/globals.css'
 import '@fontsource-variable/geist'
@@ -17,12 +19,14 @@ declare module '@tanstack/react-router' {
 	}
 }
 
+void initAuth()
+
 // Render the app
 const rootElement = document.getElementById('root')!
 
 ReactDOM.createRoot(rootElement).render(
 	<StrictMode>
-		<QueryClientProvider client={new QueryClient()}>
+		<QueryClientProvider client={queryClient}>
 			<RouterProvider router={router} />
 		</QueryClientProvider>
 	</StrictMode>,
