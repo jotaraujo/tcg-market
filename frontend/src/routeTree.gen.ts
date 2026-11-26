@@ -14,6 +14,8 @@ import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SetsRouteImport } from './routes/sets'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as CardIdRouteImport } from './routes/card/$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +43,16 @@ const SetsRoute = SetsRouteImport.update({
   path: '/sets',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CardIdRoute = CardIdRouteImport.update({
   id: '/card/$id',
   path: '/card/$id',
@@ -53,6 +65,8 @@ export interface FileRoutesByFullPath {
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/sets': typeof SetsRoute
+  '/signup': typeof SignupRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/card/$id': typeof CardIdRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +75,8 @@ export interface FileRoutesByTo {
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/sets': typeof SetsRoute
+  '/signup': typeof SignupRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/card/$id': typeof CardIdRoute
 }
 export interface FileRoutesById {
@@ -70,14 +86,31 @@ export interface FileRoutesById {
   '/marketplace': typeof MarketplaceRoute
   '/profile': typeof ProfileRoute
   '/sets': typeof SetsRoute
+  '/signup': typeof SignupRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/card/$id': typeof CardIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/favorites' | '/marketplace' | '/profile' | '/sets' | '/card/$id'
+    | '/'
+    | '/favorites'
+    | '/marketplace'
+    | '/profile'
+    | '/sets'
+    | '/signup'
+    | '/verify-email'
+    | '/card/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/favorites' | '/marketplace' | '/profile' | '/sets' | '/card/$id'
+  to:
+    | '/'
+    | '/favorites'
+    | '/marketplace'
+    | '/profile'
+    | '/sets'
+    | '/signup'
+    | '/verify-email'
+    | '/card/$id'
   id:
     | '__root__'
     | '/'
@@ -85,6 +118,8 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/profile'
     | '/sets'
+    | '/signup'
+    | '/verify-email'
     | '/card/$id'
   fileRoutesById: FileRoutesById
 }
@@ -94,6 +129,8 @@ export interface RootRouteChildren {
   MarketplaceRoute: typeof MarketplaceRoute
   ProfileRoute: typeof ProfileRoute
   SetsRoute: typeof SetsRoute
+  SignupRoute: typeof SignupRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
   CardIdRoute: typeof CardIdRoute
 }
 
@@ -134,6 +171,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SetsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/card/$id': {
       id: '/card/$id'
       path: '/card/$id'
@@ -150,6 +201,8 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceRoute: MarketplaceRoute,
   ProfileRoute: ProfileRoute,
   SetsRoute: SetsRoute,
+  SignupRoute: SignupRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
   CardIdRoute: CardIdRoute,
 }
 export const routeTree = rootRouteImport
