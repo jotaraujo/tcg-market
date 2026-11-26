@@ -59,7 +59,6 @@ const AccountMenuItems = () => {
 							asChild
 							className='min-h-10 gap-sm px-3 text-sm text-ink cursor-pointer'
 						>
-							{/* @ts-expect-error a rota /signup só nasce no T6 */}
 							<Link to='/signup'>
 								<UserPlus className='size-4 text-ink-2' aria-hidden='true' />
 								Criar nova conta
