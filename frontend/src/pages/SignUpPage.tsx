@@ -1,4 +1,5 @@
-import SignUpForm from "@/components/auth/SignUpForm"
+import SignUpForm from '@/components/auth/SignUpForm'
+import { Link } from '@tanstack/react-router'
 
 const SignUpPage = () => {
 	return (
@@ -9,7 +10,15 @@ const SignUpPage = () => {
 					Salve suas cartas favoritas e acompanhe os preços de qualquer lugar.
 				</p>
 			</header>
+
 			<SignUpForm />
+
+			<p className='text-sm text-ink-2'>
+				Já tem conta?{' '}
+				<Link to='/login' className='text-ink underline'>
+					Entrar
+				</Link>
+			</p>
 		</section>
 	)
 }

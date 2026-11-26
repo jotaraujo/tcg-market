@@ -49,7 +49,6 @@ const AccountMenuItems = () => {
 							asChild
 							className='min-h-10 gap-sm px-3 text-sm text-ink cursor-pointer'
 						>
-							{/* @ts-expect-error a rota /login só nasce no T8 */}
 							<Link to='/login'>
 								<LogIn className='size-4 text-ink-2' aria-hidden='true' />
 								Fazer Login
