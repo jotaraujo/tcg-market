@@ -4,6 +4,7 @@ import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { initAuth } from './lib/auth'
 import { queryClient } from './lib/queryClient'
+import { watchSessionLoss } from './lib/watchSessionLoss'
 import { getRouter } from './router'
 import './styles/globals.css'
 import '@fontsource-variable/geist'
@@ -20,6 +21,8 @@ declare module '@tanstack/react-router' {
 }
 
 void initAuth()
+// Vive o tempo todo da página, então o unsubscribe não é usado.
+watchSessionLoss(router)
 
 // Render the app
 const rootElement = document.getElementById('root')!

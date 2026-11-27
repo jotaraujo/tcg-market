@@ -1,9 +1,9 @@
-import { supabase } from './supabase'
-import { safeRedirectPath } from './redirect'
-import { queryClient } from './queryClient'
-import { useAuthStore } from '@/stores/useAuthStore'
-import type { AuthStatus, AuthUser } from '@/types/auth'
 import type { Session, User } from '@supabase/supabase-js'
+import { useAuthStore } from '@/stores/useAuthStore'
+import type { AuthRouterContext, AuthUser } from '@/types/auth'
+import { queryClient } from './queryClient'
+import { safeRedirectPath } from './redirect'
+import { supabase } from './supabase'
 import type { LoginInput, SignUpInput } from './validations/authSchema'
 
 export type AuthFailureCode =
@@ -87,9 +87,9 @@ export function resetAuth() {
 	initPromise = null
 }
 
-export const authRouterContext = {
+export const authRouterContext: AuthRouterContext = {
 	whenReady: whenAuthReady,
-	getStatus: (): AuthStatus => useAuthStore.getState().status,
+	getStatus: () => useAuthStore.getState().status,
 }
 
 function callbackUrl(redirectPath?: string): string {
@@ -139,5 +139,5 @@ export async function resendVerification(email: string): Promise<void> {
 		email,
 		options: { emailRedirectTo: callbackUrl() },
 	})
-  if (error) throw toAuthFailure(error)
+	if (error) throw toAuthFailure(error)
 }

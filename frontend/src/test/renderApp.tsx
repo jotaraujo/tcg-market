@@ -1,15 +1,20 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
-  createMemoryHistory,
+	createMemoryHistory,
 	createRouter,
 	RouterProvider,
 } from '@tanstack/react-router'
 import { render } from '@testing-library/react'
+import { authRouterContext } from '@/lib/auth'
 import { routeTree } from '@/routeTree.gen'
+import type { AuthRouterContext } from '@/types/auth'
 
 export const renderApp = (
 	path: string,
-	options: { queryClient?: QueryClient } = {},
+	options: {
+		queryClient?: QueryClient
+		auth?: Partial<AuthRouterContext>
+	} = {},
 ) => {
 	const queryClient =
 		options.queryClient ??
@@ -18,6 +23,7 @@ export const renderApp = (
 	vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
 	const router = createRouter({
 		routeTree,
+		context: { auth: { ...authRouterContext, ...options.auth } },
 		history: createMemoryHistory({ initialEntries: [path] }),
 	})
 
